@@ -7,7 +7,10 @@ import { useRouter } from "next/navigation";
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
@@ -17,16 +20,25 @@ export default function SignUpPage() {
     setError(null);
     setSuccessMessage("");
 
+    // Validate form fields
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      setError("All fields are required.");
+      return;
+    }
+
     // Validate password and confirm password
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
     // Attempt to sign up
-    const { error: supabaseError } = await supabase.auth.signUp({
+    const { data, error: supabaseError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { first_name: firstName, last_name: lastName }, // Save additional metadata
+      },
     });
 
     if (supabaseError) {
@@ -44,44 +56,119 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-green-950">
-      <div className="p-6 bg-white rounded-2xl">
-        <h1 className="text-2xl text-center text-green-900 font-bold mb-4">
-          Sign Up
-        </h1>
-        {error && <p className="text-red-500 py-2 px-4">{error}</p>}
-        {successMessage && (
-          <p className="text-green-500 py-2 px-4">{successMessage}</p>
-        )}
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <input
-            className="w-full px-4 py-2 border rounded-lg text-green-700"
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="w-full px-4 py-2 border rounded-lg text-green-700"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <input
-            className="w-full px-4 py-2 border rounded-lg text-green-700"
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          <button
-            className="w-full px-4 py-2 rounded-lg bg-green-800 text-white"
-            type="submit"
-          >
-            Sign Up
-          </button>
-        </form>
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Left Section */}
+      <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white">
+        <button
+          className="self-start font-bold text-gray-600 hover:text-gray-800 ml-0.5 mb-16"
+          onClick={() => router.back()}
+        >
+          ← Go Back
+        </button>
+
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Create An Account!
+          </h1>
+          <p className="text-gray-500">Sign Up</p>
+          <form onSubmit={handleSignUp} className="space-y-4 mt-10">
+            {error && <p className="text-red-500 text-sm mb-4">* {error}</p>}
+            {successMessage && (
+              <p className="text-green-500 py-2 px-4">{successMessage}</p>
+            )}
+            {/* Name Fields */}
+            <div className="flex flex-1">
+              <div className="mr-4">
+                <input
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                  type="text"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+              <div>
+                <input
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                  type="text"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+            {/* Email Field */}
+            <div>
+              <input
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            {/* Password Fields */}
+            <div className="relative">
+              <input
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "🐵" : "🙈"}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "🐵" : "🙈"}
+              </button>
+            </div>
+            {/* Remember Me and Forgot Password */}
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <label className="flex items-center">
+                <input type="checkbox" className="mr-2" />
+                Remember me
+              </label>
+              <a href="#" className="text-green-500 hover:underline">
+                Forgot Password?
+              </a>
+            </div>
+            {/* Sign Up Button */}
+            <button
+              type="submit"
+              className="w-full mt-16 font-bold py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              Sign Up
+            </button>
+          </form>
+          <p className="text-sm mt-16 text-center text-gray-500">
+            Already have an account?{" "}
+            <a href="/login" className="text-green-500 hover:underline">
+              Log in
+            </a>
+          </p>
+        </div>
+      </div>
+      {/* Right Section */}
+      <div className="hidden md:flex flex-1 items-center justify-center bg-gray-200">
+        <div className="w-3/4 h-5/6 bg-gray-300 rounded-xl"></div>
       </div>
     </div>
   );
