@@ -53,7 +53,7 @@ export default function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-white">
       {/* Sidebar */}
       {!isOpen && (
         <nav className="bg-white w-full lg:hidden p-2 text-gray-800 fixed z-50">
@@ -68,7 +68,7 @@ export default function Dashboard() {
         onClick={() => setIsOpen(false)} // Close when clicking outside
       ></div>
       <div
-        className={`fixed top-0 left-0 w-64 bg-gray-200 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-50 transform transition-transform rounded-xl m-4 ${
+        className={`fixed top-0 left-0 w-64 bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-50 transform transition-transform rounded-xl m-4 ${
           isOpen ? "translate-x-0" : "-translate-x-full "
         } lg:translate-x-0 lg:static lg:w-48`}
       >
@@ -109,29 +109,22 @@ export default function Dashboard() {
               <p className="text-gray-600">Track your energy consumption</p>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="bg-gray-200 px-4 py-2 rounded-full shadow-sm text-sm text-black">
+              <button className="bg-gray-100 px-4 py-2 rounded-full shadow-sm text-sm text-black">
                 {new Date().toLocaleDateString()}
               </button>
             </div>
           </div>
-          <div className="bg-green-950 text-white p-4 rounded-md mt-4">
-            <p>
-              ⚠️ You have 3 unassigned appointments. Go to your appointments and
-              book a date and time.
-            </p>
+          <div className="bg-gray-100 text-sm font-semibold text-gray-500 p-2 rounded-full mt-4">
+            <p>⚠️ You have 3 unassigned monthly reports.</p>
           </div>
         </header>
 
         {/* Main Grid */}
         <div className="grid text-black grid-cols-1 lg:grid-cols-6 gap-8">
           {/* Monthly Consumption */}
-          <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
-            <h2>Report</h2>
-            <Line data={data} />
-          </div>
 
           {/* Filters Section */}
-          <div className="bg-white rounded-xl p-6 col-span-2">
+          <div className="bg-gray-100 rounded-xl p-6 col-span-2">
             <h3 className="text-lg font-bold mb-4">Filter Data</h3>
             <form className="space-y-4">
               <div>
@@ -143,7 +136,7 @@ export default function Dashboard() {
                 </label>
                 <select
                   id="utility"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option>Water</option>
                   <option>Gas</option>
@@ -160,7 +153,7 @@ export default function Dashboard() {
                 <input
                   type="date"
                   id="date"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
@@ -172,7 +165,7 @@ export default function Dashboard() {
                 </label>
                 <select
                   id="time"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   <option>8:00 AM - 12:00 PM</option>
                   <option>12:00 PM - 4:00 PM</option>
@@ -190,18 +183,22 @@ export default function Dashboard() {
                   type="text"
                   id="location"
                   placeholder="Enter location"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
             </form>
           </div>
+          <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
+            <h2>Report</h2>
+            <Line data={data} />
+          </div>
         </div>
       </main>
       {/* Reports Section */}
-      <div className="bg-gray-200 text-black rounded-xl m-4 p-6 w-1/6">
+      <div className="bg-gray-100 text-black rounded-xl m-4 p-6 w-1/6">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold">Reports</h3>
-          <button className="text-green-500 hover:bg-green-100 p-2 rounded-md">
+          <button className="text-green-500 hover:bg-green-100 p-2 rounded-xl">
             <FaPlus size={18} />
           </button>
         </div>
@@ -214,18 +211,18 @@ export default function Dashboard() {
           </label>
           <select
             id="year"
-            className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full p-3 mb-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             <option>2025</option>
             <option>2024</option>
             <option>2023</option>
           </select>
           <div className="space-y-4">
-            <button className="w-full flex items-center justify-between bg-gray-100 p-4 rounded-md text-gray-700 hover:bg-gray-200">
+            <button className="w-full flex items-center justify-between bg-gray-100 p-4 rounded-xl text-gray-700 hover:bg-gray-200">
               <span>January</span>
               <span>11:22 PM</span>
             </button>
-            <button className="w-full flex items-center justify-between bg-gray-100 p-4 rounded-md text-gray-700 hover:bg-gray-200">
+            <button className="w-full flex items-center justify-between bg-gray-100 p-4 rounded-xl text-gray-700 hover:bg-gray-200">
               <span>March</span>
               <span>11:22 PM</span>
             </button>
