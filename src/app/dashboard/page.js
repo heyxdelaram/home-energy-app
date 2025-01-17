@@ -32,7 +32,15 @@ export default function Dashboard() {
     labels: ["Jan", "Feb", "Mar", "Apr", "May"],
     datasets: [
       {
-        label: "Monthly Consumption",
+        label: "Expected Consumption",
+        data: [70, 60, 90, 85, 60],
+        borderColor: "#2196F3",
+        backgroundColor: "rgba(33, 150, 243, 0.2)",
+        borderWidth: 2,
+        pointBackgroundColor: "#2196F3",
+      },
+      {
+        label: "Consumed",
         data: [65, 59, 80, 81, 56],
         borderColor: "#4CAF50",
         backgroundColor: "rgba(76, 175, 80, 0.2)",
@@ -115,23 +123,15 @@ export default function Dashboard() {
         </header>
 
         {/* Main Grid */}
-        <div className="grid text-black grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid text-black grid-cols-1 lg:grid-cols-6 gap-8">
           {/* Monthly Consumption */}
-          <div>
-            <div className="bg-white rounded-md shadow-md p-6 col-span-1 lg:col-span-2">
-              {/* <h2 className="text-lg font-bold mb-4">Monthly Consumption</h2> */}
-              <Line data={data} />
-            </div>
-
-            {/* Expected Consumption */}
-            <div className="bg-white rounded-md shadow-md p-6 col-span-1">
-              {/* <h2 className="text-lg font-bold mb-4">Expected Consumption</h2> */}
-              <Line data={data} />
-            </div>
+          <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
+            <h2>Report</h2>
+            <Line data={data} />
           </div>
 
           {/* Filters Section */}
-          <div className="bg-white rounded-md shadow-md p-6">
+          <div className="bg-white rounded-xl p-6 col-span-2">
             <h3 className="text-lg font-bold mb-4">Filter Data</h3>
             <form className="space-y-4">
               <div>
