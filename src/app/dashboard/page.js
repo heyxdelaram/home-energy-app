@@ -25,9 +25,61 @@ ChartJS.register(
 
 import { FaPlus } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "../../../lib/supabaseClient";
 
 export default function Dashboard() {
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from("bills")
+        .select("month, usage, cost, goal_usage")
+        .order("month", { ascending: true });
+
+      if (error) console.log("Error fetching data: ", error);
+      else {
+        const labels = [];
+        const usageData = [];
+        const costData = [];
+        const goalUsageData = [];
+
+        data.forEach((item) => {
+          if (!labels.includes(item.month)) {
+            labels.push(item.month);
+            usageData.push(item.usage);
+            costData.push(item.cost);
+            goalUsageData.push(item.goal_usage);
+          }
+        });
+        setChartData({
+          labels: labels,
+          datasets: [
+            {
+              label: "Usage",
+              data: usageData,
+              borderColor: "#2196F3",
+              backgroundColor: "rgba(33, 150, 243, 0.2)",
+            },
+            {
+              label: "Cost",
+              data: costData,
+              borderColor: "#4CAF50",
+              backgroundColor: "rgba(76, 175, 80, 0.2)",
+            },
+            {
+              label: "Goal Usage",
+              data: goalUsageData,
+              borderColor: "#FF9800",
+              backgroundColor: "rgba(255, 152, 0, 0.2)",
+            },
+          ],
+        });
+      }
+    };
+    fetchData();
+  }, []);
   const data = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May"],
     datasets: [
@@ -190,7 +242,7 @@ export default function Dashboard() {
           </div>
           <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
             <h2>Report</h2>
-            <Line data={data} />
+            <Line data={chartData} />
           </div>
         </div>
       </main>
