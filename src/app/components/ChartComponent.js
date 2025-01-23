@@ -23,11 +23,13 @@ ChartJS.register(
   Legend
 );
 
-export default function Chart({ chartData }) {
+function ChartComponent({ chartData }) {
   return (
-    <div className="bg-white rounded-xl p-6">
+    <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
       <h2>Report</h2>
       <Line data={chartData} />
     </div>
   );
 }
+
+export default ChartComponent;
