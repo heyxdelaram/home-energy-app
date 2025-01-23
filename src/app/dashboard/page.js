@@ -84,6 +84,10 @@ export default function Dashboard() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    resetFormData();
+  };
+
+  const resetFormData = () => {
     setFormData({
       cost: "",
       usage: "",
@@ -188,10 +192,14 @@ export default function Dashboard() {
 
           <div className="grid text-black grid-cols-1 lg:grid-cols-6 gap-8">
             {/* Report Data Display Section */}
-            <ReportData />
-
+            <ReportData
+              formData={formData}
+              setFormData={setFormData}
+              handleInputChange={handleInputChange}
+              resetFormData={resetFormData}
+            />
             {/* Chart Section */}
-            <ChartComponent chartData={chartData} />
+            <ChartComponent chartData={data} />
           </div>
         </main>
         {/* Reports Section */}

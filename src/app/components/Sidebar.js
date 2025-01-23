@@ -1,4 +1,12 @@
 import React from "react";
+import {
+  FaTachometerAlt,
+  FaFileAlt,
+  FaCog,
+  FaQuestionCircle,
+  FaSignOutAlt,
+  FaFile,
+} from "react-icons/fa";
 
 function Sidebar({ isOpen, setIsOpen }) {
   return (
@@ -18,29 +26,46 @@ function Sidebar({ isOpen, setIsOpen }) {
       <div
         className={`fixed top-0 left-0 w-64 bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
           isOpen ? "translate-x-0" : "-translate-x-full "
-        } lg:translate-x-0 lg:static lg:w-48`}
+        } lg:translate-x-0 lg:static lg:w-48 lg:pt-24`}
       >
-        <div className="space-y-2">
+        <div className="space-y-2 ">
           <a
             href="/dashboard"
-            className="block text-lg font-medium hover:text-green-400"
+            className="flex items-center space-x-2 block hover:text-green-800 text-m"
           >
-            Dashboard
+            <FaTachometerAlt color="green" /> {/* Dashboard Icon */}
+            <span>Dashboard</span>
           </a>
-          <a href="#" className="block text-lg hover:text-green-400">
-            Reports
+          <a
+            href="#"
+            className="flex items-center space-x-2 block text-m hover:text-green-800"
+          >
+            <FaFileAlt color="green" /> {/* Reports Icon */}
+            <span>Reports</span>
           </a>
         </div>
         {/* Footer Links */}
         <div className="space-y-2">
-          <a href="#" className="block text-lg hover:text-gray-400">
-            Settings
+          <a
+            href="#"
+            className="flex items-center space-x-2 block text-m hover:text-green-800"
+          >
+            <FaCog color="green" /> {/* Settings Icon */}
+            <span>Settings</span>
           </a>
-          <a href="#" className="block text-lg hover:text-gray-400">
-            Help
+          <a
+            href="#"
+            className="flex items-center space-x-2 block text-m hover:text-green-800"
+          >
+            <FaQuestionCircle color="green" /> {/* Help Icon */}
+            <span>Help</span>
           </a>
-          <a href="#" className="block text-lg text-red-400 hover:text-red-300">
-            Log Out
+          <a
+            href="#"
+            className="flex items-center space-x-2 block text-m hover:text-green-800"
+          >
+            <FaSignOutAlt color="green" /> {/* Log Out Icon */}
+            <span>Log Out</span>
           </a>
         </div>
       </div>
