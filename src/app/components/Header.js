@@ -1,10 +1,18 @@
-// components/Header.js
-export default function Header({ name, date }) {
+export default function Header() {
   return (
-    <header className="p-6 bg-white shadow">
-      <h1 className="text-2xl font-semibold">Hello, {name}</h1>
-      <p className="text-gray-500">Track your energy consumption</p>
-      <p className="text-gray-700 font-medium">{date}</p>
+    <header>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-700">Hello, Margaret</h1>
+          <p className="text-gray-600">Track your energy consumption</p>
+        </div>
+        <button className="bg-gray-100 px-4 py-2 rounded-full shadow-sm text-sm text-black">
+          {new Date().toLocaleDateString()}
+        </button>
+      </div>
+      <div className="bg-gray-100 text-sm font-semibold text-gray-500 p-2 rounded-full mt-4">
+        <p>⚠️ You have 3 unassigned monthly reports.</p>
+      </div>
     </header>
   );
 }

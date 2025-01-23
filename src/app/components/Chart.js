@@ -23,23 +23,11 @@ ChartJS.register(
   Legend
 );
 
-export default function Chart() {
-  const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May"], // "category" scale data
-    datasets: [
-      {
-        label: "Monthly Consumption",
-        data: [65, 59, 80, 81, 56],
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 2,
-      },
-    ],
-  };
-
+export default function Chart({ chartData }) {
   return (
-    <div className="mb-6">
-      <h2 className="text-lg font-semibold mb-2">Energy Consumption</h2>
-      <Line data={data} />
+    <div className="bg-white rounded-xl p-6">
+      <h2>Report</h2>
+      <Line data={chartData} />
     </div>
   );
 }
