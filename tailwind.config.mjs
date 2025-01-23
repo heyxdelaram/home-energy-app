@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily:{
+        sans: ['Poppins', 'Cambria', 'Cochin', 'Georgia', 'Times', 'serif'],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

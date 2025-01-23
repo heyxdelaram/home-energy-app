@@ -329,66 +329,35 @@ export default function Dashboard() {
 
             {/* Filters Section */}
             <div className="bg-gray-100 rounded-xl p-6 col-span-2">
-              <h3 className="text-lg font-bold mb-4">Filter Data</h3>
-              <form className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="utility"
-                    className="block text-sm font-medium text-gray-600"
-                  >
-                    Select Utility
-                  </label>
-                  <select
-                    id="utility"
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option>Water</option>
-                    <option>Gas</option>
-                    <option>Electricity</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="date"
-                    className="block text-sm font-medium text-gray-600"
-                  >
-                    Date
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="time"
-                    className="block text-sm font-medium text-gray-600"
-                  >
-                    Time
-                  </label>
-                  <select
-                    id="time"
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option>8:00 AM - 12:00 PM</option>
-                    <option>12:00 PM - 4:00 PM</option>
-                    <option>4:00 PM - 8:00 PM</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="location"
-                    className="block text-sm font-medium text-gray-600"
-                  >
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    id="location"
-                    placeholder="Enter location"
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
+              <h3 className="text-lg font-bold mb-8 text-left">Report Data</h3>
+              <form className="space-y-4 flex flex-col items-center">
+                <div className="space-y-4">
+                  {/* Select Utility Field */}
+                  <div className="flex flex-row items-center">
+                    <label className="block w-28 text-m font-semibold text-gray-600">
+                      Bill Type
+                    </label>
+                    <select
+                      id="utility"
+                      className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="water">Water</option>
+                      <option value="gas">Gas</option>
+                      <option value="electricity">Electricity</option>
+                    </select>
+                  </div>
+
+                  {/* Date Field */}
+                  <div className="flex flex-row items-center">
+                    <label className="block w-28 text-m font-semibold text-gray-600">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      id="date"
+                      className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
                 </div>
               </form>
             </div>
