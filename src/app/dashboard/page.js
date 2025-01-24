@@ -43,11 +43,7 @@ export default function Dashboard() {
     billType: "water",
   });
   const user = supabase.auth.getUser();
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const [existingBills, setExistingBills] = useState([]);
 
   const addBill = async () => {
     const { cost, usage, date, billType } = formData;
@@ -100,49 +96,88 @@ export default function Dashboard() {
     const fetchData = async () => {
       const { data, error } = await supabase
         .from("bills")
-        .select("month, usage, cost, goal_usage")
-        .order("month", { ascending: true });
+        .select("date, usage, cost, goal_usage, bill_type")
+        .order("date", { ascending: true });
 
-      if (error) console.log("Error fetching data: ", error);
-      else {
-        const labels = [];
-        const usageData = [];
-        const costData = [];
-        const goalUsageData = [];
-
-        data.forEach((item) => {
-          if (!labels.includes(item.month)) {
-            labels.push(item.month);
-            usageData.push(item.usage);
-            costData.push(item.cost);
-            goalUsageData.push(item.goal_usage);
-          }
-        });
-        setChartData({
-          labels: labels,
-          datasets: [
-            {
-              label: "Usage",
-              data: usageData,
-              borderColor: "#2196F3",
-              backgroundColor: "rgba(33, 150, 243, 0.2)",
-            },
-            {
-              label: "Cost",
-              data: costData,
-              borderColor: "#4CAF50",
-              backgroundColor: "rgba(76, 175, 80, 0.2)",
-            },
-            {
-              label: "Goal Usage",
-              data: goalUsageData,
-              borderColor: "#FF9800",
-              backgroundColor: "rgba(255, 152, 0, 0.2)",
-            },
-          ],
-        });
+      if (error) {
+        console.error("Error fetching data:", error.message);
+        return;
       }
+
+      console.log("Raw fetched data:", data);
+
+      if (!data || data.length === 0) {
+        console.warn("No data found or empty response from Supabase.");
+        return;
+      }
+
+      const currentMonth = new Date().toLocaleString("default", {
+        month: "short",
+      });
+      const filteredData = data.filter((item) => {
+        if (!item.date) {
+          console.warn("Skipping item with missing date:", item);
+          return false;
+        }
+
+        const itemMonth = new Date(item.date).toLocaleString("default", {
+          month: "short",
+        });
+        return itemMonth === currentMonth;
+      });
+
+      console.log("Filtered data for the current month:", filteredData);
+
+      const billsOfMonth = filteredData.map((item) => item.bill_type); // Extract bill_type values
+      const uniqueBillsOfMonth = [...new Set(billsOfMonth)]; // Ensure uniqueness
+
+      console.log("Unique bills of the month:", uniqueBillsOfMonth);
+
+      // Update `existingBills` state
+      setExistingBills(uniqueBillsOfMonth);
+
+      const formattedData = filteredData.map((item) => {
+        const month = new Date(item.date).toLocaleString("default", {
+          month: "short",
+        });
+        return { ...item, month };
+      });
+      // Prepare chart data
+      const labels = [...new Set(formattedData.map((item) => item.month))];
+      const usageData = formattedData.map((item) => item.usage || 0);
+      const costData = formattedData.map((item) => item.cost || 0);
+      const goalUsageData = formattedData.map((item) => item.goal_usage || 0);
+
+      console.log("Labels:", labels);
+      console.log("Usage Data:", usageData);
+      console.log("Cost Data:", costData);
+      console.log("Goal Usage Data:", goalUsageData);
+
+      setChartData({
+        labels,
+        datasets: [
+          {
+            label: "Usage",
+            data: usageData,
+            borderColor: "#2196F3",
+            backgroundColor: "rgba(33, 150, 243, 0.2)",
+          },
+          {
+            label: "Cost",
+            data: costData,
+            borderColor: "#4CAF50",
+            backgroundColor: "rgba(76, 175, 80, 0.2)",
+          },
+          {
+            label: "Goal Usage",
+            data: goalUsageData,
+            borderColor: "#FF9800",
+            backgroundColor: "rgba(255, 152, 0, 0.2)",
+          },
+        ],
+      });
     };
+
     fetchData();
   }, []);
   const data = {
@@ -176,9 +211,10 @@ export default function Dashboard() {
         <Modal
           closeModal={closeModal}
           formData={formData}
-          handleInputChange={handleInputChange}
           addBill={addBill}
+          setFormData={setFormData}
           setIsModalOpen={setIsModalOpen}
+          existingBills={existingBills}
         />
       )}
       <div className="flex h-screen bg-white">
@@ -195,7 +231,6 @@ export default function Dashboard() {
             <ReportData
               formData={formData}
               setFormData={setFormData}
-              handleInputChange={handleInputChange}
               resetFormData={resetFormData}
             />
             {/* Chart Section */}

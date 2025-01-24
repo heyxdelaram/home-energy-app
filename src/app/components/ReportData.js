@@ -2,12 +2,7 @@
 
 import React, { useState } from "react";
 
-const ReportData = ({
-  formData,
-  setFormData,
-  handleInputChange,
-  resetFormData,
-}) => {
+const ReportData = ({ formData, setFormData, resetFormData }) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleEdit = () => {
@@ -21,6 +16,11 @@ const ReportData = ({
   const handleCancel = () => {
     setIsEditing(false);
     resetFormData();
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   return (

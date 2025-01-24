@@ -3,10 +3,17 @@ import React from "react";
 function Modal({
   closeModal,
   formData,
-  handleInputChange,
+  setFormData,
   addBill,
   setIsModalOpen,
+  existingBills,
 }) {
+  const isBillTypeDisabled = (billType) => existingBills.includes(billType);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-none flex justify-center items-center z-50"
@@ -33,9 +40,18 @@ function Modal({
                 onChange={handleInputChange}
                 className="w-48 p-3 border border-gray-300 bg-black rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               >
-                <option value="water">Water</option>
-                <option value="gas">Gas</option>
-                <option value="electricity">Electricity</option>
+                <option value="water" disabled={isBillTypeDisabled("water")}>
+                  Water
+                </option>
+                <option value="gas" disabled={isBillTypeDisabled("gas")}>
+                  Gas
+                </option>
+                <option
+                  value="electricity"
+                  disabled={isBillTypeDisabled("electricity")}
+                >
+                  Electricity
+                </option>
               </select>
             </div>
             {/* Cost Field */}
