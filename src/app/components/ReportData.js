@@ -1,43 +1,55 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const ReportData = ({ formData, setFormData, resetFormData }) => {
+  const [localFormData, setLocalFormData] = useState(formData); // Maintain local state for editing
   const [isEditing, setIsEditing] = useState(false);
+
+  // Sync local state with parent when formData updates
+  useEffect(() => {
+    setLocalFormData(formData);
+  }, [formData]);
+
+  // Handle input changes locally
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setLocalFormData({ ...localFormData, [name]: value });
+  };
+
+  // Save changes and update parent state
+  const handleSave = () => {
+    setIsEditing(false);
+    setFormData(localFormData); // Sync changes to parent
+  };
+
+  // Cancel editing and revert to parent-provided data
+  const handleCancel = () => {
+    setIsEditing(false);
+    setLocalFormData(formData); // Reset to parent state
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
-  };
-
-  const handleSave = () => {
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    resetFormData();
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
   };
 
   return (
     <div className="bg-gray-100 rounded-xl p-6 col-span-2">
       <div className="flex flex-row items-center justify-between mb-8">
         <h3 className="text-lg font-bold text-left">Report Data</h3>
-        <button
-          onClick={handleEdit}
-          className="rounded-xl py-1 px-4 bg-green-600 text-white font-medium hover:bg-green-800"
-        >
-          Edit
-        </button>
+        {!isEditing && (
+          <button
+            onClick={handleEdit}
+            className="rounded-xl py-1 px-4 bg-green-600 text-white font-medium hover:bg-green-800"
+          >
+            Edit
+          </button>
+        )}
       </div>
 
       <form className="space-y-4 flex flex-col items-center justify-between">
         <div className="space-y-4">
-          {/* Select Utility Field */}
+          {/* Select Bill Type */}
           <div className="flex flex-row items-center">
             <label className="block w-28 text-m font-semibold text-gray-600">
               Bill Type
@@ -46,9 +58,9 @@ const ReportData = ({ formData, setFormData, resetFormData }) => {
               id="utility"
               name="billType"
               className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
-              value={formData.billType}
+              value={localFormData.billType}
               onChange={handleInputChange}
-              disabled={!isEditing} // Disable when not in edit mode
+              disabled={!isEditing}
             >
               <option value="water">Water</option>
               <option value="gas">Gas</option>
@@ -64,10 +76,10 @@ const ReportData = ({ formData, setFormData, resetFormData }) => {
             <input
               type="number"
               name="cost"
-              value={formData.cost}
+              value={localFormData.cost}
               onChange={handleInputChange}
               className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
-              disabled={!isEditing} // Disable when not in edit mode
+              disabled={!isEditing}
             />
           </div>
 
@@ -79,11 +91,10 @@ const ReportData = ({ formData, setFormData, resetFormData }) => {
             <input
               type="number"
               name="usage"
-              value={formData.usage}
+              value={localFormData.usage}
               onChange={handleInputChange}
               className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
-              placeholder="Enter usage"
-              disabled={!isEditing} // Disable when not in edit mode
+              disabled={!isEditing}
             />
           </div>
 
@@ -96,24 +107,26 @@ const ReportData = ({ formData, setFormData, resetFormData }) => {
               type="date"
               id="date"
               name="date"
-              value={formData.date}
+              value={localFormData.date}
               onChange={handleInputChange}
               className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
-              disabled={!isEditing} // Disable when not in edit mode
+              disabled={!isEditing}
             />
           </div>
         </div>
 
-        {/* Save and Cancel buttons */}
+        {/* Save and Cancel Buttons */}
         {isEditing && (
           <div className="flex space-x-4 mt-4">
             <button
+              type="button"
               onClick={handleSave}
               className="py-2 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-800"
             >
               Save
             </button>
             <button
+              type="button"
               onClick={handleCancel}
               className="py-2 px-4 bg-gray-600 text-white rounded-xl hover:bg-gray-800"
             >

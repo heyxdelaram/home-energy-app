@@ -44,6 +44,7 @@ export default function Dashboard() {
   });
   const user = supabase.auth.getUser();
   const [existingBills, setExistingBills] = useState([]);
+  const [fetchedReports, setFetchedReports] = useState([])
 
   const addBill = async () => {
     const { cost, usage, date, billType } = formData;
@@ -102,6 +103,10 @@ export default function Dashboard() {
       if (error) {
         console.error("Error fetching data:", error.message);
         return;
+      }else{
+        console.log("Fetched reports:", data);
+        setFetchedReports(data || []); // Set the fetched reports
+        
       }
 
       console.log("Raw fetched data:", data);
@@ -142,11 +147,12 @@ export default function Dashboard() {
         });
         return { ...item, month };
       });
+      console.log(formattedData)
       // Prepare chart data
-      const labels = [...new Set(formattedData.map((item) => item.month))];
-      const usageData = formattedData.map((item) => item.usage || 0);
-      const costData = formattedData.map((item) => item.cost || 0);
-      const goalUsageData = formattedData.map((item) => item.goal_usage || 0);
+      const labels = [...new Set(data.map((item) => item.month))];
+      const usageData = data.map((item) => item.usage || 0);
+      const costData = data.map((item) => item.cost || 0);
+      const goalUsageData = data.map((item) => item.goal_usage || 0);
 
       console.log("Labels:", labels);
       console.log("Usage Data:", usageData);
@@ -234,11 +240,15 @@ export default function Dashboard() {
               resetFormData={resetFormData}
             />
             {/* Chart Section */}
-            <ChartComponent chartData={data} />
+            <ChartComponent chartData={chartData} />
           </div>
         </main>
         {/* Reports Section */}
-        <ReportsList setIsModalOpen={setIsModalOpen} />
+        <ReportsList
+  setIsModalOpen={setIsModalOpen}
+  reports={fetchedReports} // fetchedReports is an array of reports from Supabase
+/>
+
       </div>
     </>
   );
