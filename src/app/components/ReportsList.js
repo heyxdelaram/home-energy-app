@@ -63,10 +63,10 @@ const ReportsList = ({ setIsModalOpen, reports }) => {
               {reports.map((report, index) => (
                 <button
                   key={index}
-                  className="w-full flex items-center justify-between p-4 bg-green-600 rounded-xl hover:bg-gray-200"
+                  className="w-full flex items-center justify-between m-2 p-4 bg-green-600 rounded-xl hover:bg-gray-200"
                 >
                   <span>{report.bill_type}</span>
-                  <span>{new Date(report.date).toLocaleTimeString()}</span>
+                  {/* <span>{new Date(report.date).toLocaleTimeString()}</span> */}
                 </button>
               ))}
             </div>

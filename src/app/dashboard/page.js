@@ -42,47 +42,128 @@ export default function Dashboard() {
     date: "",
     billType: "water",
   });
-  const user = supabase.auth.getUser();
+  const [user, setUser] = useState({});
   const [existingBills, setExistingBills] = useState([]);
-  const [fetchedReports, setFetchedReports] = useState([])
+  const [fetchedReports, setFetchedReports] = useState([]);
+  const [lastReport, setLastReport] = useState({}); // State to hold the last report
 
-  const addBill = async () => {
-    const { cost, usage, date, billType } = formData;
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
 
-    // Get the current user
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+      if (userError) {
+        console.error("Error fetching user:", userError.message);
+        return;
+      }
+      
+      setUser(userData.user);
+      
+      const { data, error } = await supabase
+      .from("bills")
+      .select("date, usage, cost, goal_usage, bill_type")
+      .eq("user_id", userData.user.id)
+      .order("date", { ascending: false })
+      .limit(1);
+      
+      if (error) {
+        console.error("Error fetching last report:", error.message);
+        return;
+      } else if (data && data.length > 0) {
+        const lastReportData = data[0];
+        setLastReport(lastReportData);
+        setFormData({
+          cost: lastReportData.cost.toString(),
+          usage: lastReportData.usage.toString(),
+          date: lastReportData.date,
+          billType: lastReportData.bill_type,
+        });
+      } else {
+        console.log("No last report found.");
+      }
+      
+      // Fetch all reports for chart data
+      const allReports = await supabase
+      .from("bills")
+      .select("date, usage, cost, goal_usage, bill_type")
+      .eq("user_id", userData.user.id);
+      
+      if (allReports.error) {
+        console.error("Error fetching all reports:", allReports.error.message);
+        return;
+      }
+      
+      setFetchedReports(allReports.data || []);
+      
+      console.log("Fetched Reports:", fetchedReports);
+      console.log("Last Report:", lastReport);
 
-    if (userError) {
-      console.error("Error fetching user:", userError.message);
-      return;
-    }
+      if (lastReport && lastReport.bill_type && lastReport.date) {
+        const filteredReports = allReports.data.filter((report) => {
+          const reportDate = new Date(report.date);
+          const lastReportDate = new Date(lastReport.date);
+          const lastReportMonth = lastReportDate.getMonth();
+          const lastReportYear = lastReportDate.getFullYear();
+          const reportMonth = reportDate.getMonth();
+          const reportYear = reportDate.getFullYear();
 
-    const { data, error } = await supabase.from("bills").insert([
-      {
-        cost: parseFloat(cost),
-        usage: parseFloat(usage),
-        date,
-        bill_type: billType, // Ensure this matches your database column name
-        user_id: user.id, // Add the user's ID
-      },
-    ]);
+          // Filter for the last three months of the same bill type
+          if (report.bill_type === lastReport.bill_type) {
+            if (
+              reportYear === lastReportYear &&
+              reportMonth >= lastReportMonth - 3 &&
+              reportMonth <= lastReportMonth
+            ) {
+              return true;
+            } else if (
+              reportYear === lastReportYear - 1 &&
+              reportMonth >= 9 &&
+              reportMonth <= 11
+            ) {
+              return true;
+            }
+          }
+          return false;
+        });
 
-    if (error) {
-      console.error("Error adding bill:", error.message);
-    } else {
-      console.log("Bill added successfully:", data);
-      setIsModalOpen(false); // Close the modal
-      setFormData({ cost: "", usage: "", date: "", billType: "" }); // Reset form
-    }
-  };
+        if (filteredReports.length > 0) {
+          const labels = filteredReports.map((report) => {
+            const date = new Date(report.date);
+            return date.toLocaleString("default", { month: "short", year: "numeric" });
+          });
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    resetFormData();
-  };
+          const usageData = filteredReports.map((report) => report.usage || 0);
+          const costData = filteredReports.map((report) => report.cost || 0);
+          const goalUsageData = filteredReports.map((report) => report.goal_usage || 0);
+
+          setChartData({
+            labels,
+            datasets: [
+              {
+                label: "Usage",
+                data: usageData,
+                borderColor: "#2196F3",
+                backgroundColor: "rgba(33, 150, 243, 0.2)",
+              },
+              {
+                label: "Cost",
+                data: costData,
+                borderColor: "#4CAF50",
+                backgroundColor: "rgba(76, 175, 80, 0.2)",
+              },
+              {
+                label: "Goal Usage",
+                data: goalUsageData,
+                borderColor: "#FF9800",
+                backgroundColor: "rgba(255, 152, 0, 0.2)",
+              },
+            ],
+          });
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const resetFormData = () => {
     setFormData({
@@ -93,99 +174,6 @@ export default function Dashboard() {
     });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase
-        .from("bills")
-        .select("date, usage, cost, goal_usage, bill_type")
-        .order("date", { ascending: true });
-
-      if (error) {
-        console.error("Error fetching data:", error.message);
-        return;
-      }else{
-        console.log("Fetched reports:", data);
-        setFetchedReports(data || []); // Set the fetched reports
-        
-      }
-
-      console.log("Raw fetched data:", data);
-
-      if (!data || data.length === 0) {
-        console.warn("No data found or empty response from Supabase.");
-        return;
-      }
-
-      const currentMonth = new Date().toLocaleString("default", {
-        month: "short",
-      });
-      const filteredData = data.filter((item) => {
-        if (!item.date) {
-          console.warn("Skipping item with missing date:", item);
-          return false;
-        }
-
-        const itemMonth = new Date(item.date).toLocaleString("default", {
-          month: "short",
-        });
-        return itemMonth === currentMonth;
-      });
-
-      console.log("Filtered data for the current month:", filteredData);
-
-      const billsOfMonth = filteredData.map((item) => item.bill_type); // Extract bill_type values
-      const uniqueBillsOfMonth = [...new Set(billsOfMonth)]; // Ensure uniqueness
-
-      console.log("Unique bills of the month:", uniqueBillsOfMonth);
-
-      // Update `existingBills` state
-      setExistingBills(uniqueBillsOfMonth);
-
-      const formattedData = filteredData.map((item) => {
-        const month = new Date(item.date).toLocaleString("default", {
-          month: "short",
-        });
-        return { ...item, month };
-      });
-      console.log(formattedData)
-      // Prepare chart data
-      const labels = [...new Set(data.map((item) => item.month))];
-      const usageData = data.map((item) => item.usage || 0);
-      const costData = data.map((item) => item.cost || 0);
-      const goalUsageData = data.map((item) => item.goal_usage || 0);
-
-      console.log("Labels:", labels);
-      console.log("Usage Data:", usageData);
-      console.log("Cost Data:", costData);
-      console.log("Goal Usage Data:", goalUsageData);
-
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: "Usage",
-            data: usageData,
-            borderColor: "#2196F3",
-            backgroundColor: "rgba(33, 150, 243, 0.2)",
-          },
-          {
-            label: "Cost",
-            data: costData,
-            borderColor: "#4CAF50",
-            backgroundColor: "rgba(76, 175, 80, 0.2)",
-          },
-          {
-            label: "Goal Usage",
-            data: goalUsageData,
-            borderColor: "#FF9800",
-            backgroundColor: "rgba(255, 152, 0, 0.2)",
-          },
-        ],
-      });
-    };
-
-    fetchData();
-  }, []);
   const data = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May"],
     datasets: [
@@ -246,7 +234,8 @@ export default function Dashboard() {
         {/* Reports Section */}
         <ReportsList
   setIsModalOpen={setIsModalOpen}
-  reports={fetchedReports} // fetchedReports is an array of reports from Supabase
+  reports={fetchedReports}
+  user={user} // fetchedReports is an array of reports from Supabase
 />
 
       </div>

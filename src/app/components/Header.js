@@ -5,9 +5,13 @@ function Header({ user }) {
     <header className="">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-700">
-            Hello, {`${user.displayName}`}
-          </h1>
+          {user && user.user_metadata && user.user_metadata.first_name ? (
+            <h1 className="text-3xl font-bold text-gray-700">
+              Hello, {user.user_metadata.first_name}
+            </h1>
+          ) : (
+            <h1 className="text-3xl font-bold text-gray-700">Hello, User</h1>
+          )}
           <p className="text-gray-600">Track your energy consumption</p>
         </div>
         <div className="flex items-center space-x-4">
