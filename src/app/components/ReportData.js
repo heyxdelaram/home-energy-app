@@ -1,32 +1,41 @@
-"use client";
+"use client"
 
 import React, { useState, useEffect } from "react";
 
-const ReportData = ({ formData, setFormData, resetFormData }) => {
-  const [localFormData, setLocalFormData] = useState(formData); // Maintain local state for editing
+const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
+  const [localFormData, setLocalFormData] = useState(formData);
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Sync local state with parent when formData updates
   useEffect(() => {
     setLocalFormData(formData);
   }, [formData]);
 
-  // Handle input changes locally
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Basic validation for cost and usage
+    if (name === "cost" || name === "usage") {
+      if (!value || isNaN(parseFloat(value))) {
+        setError("Please enter a valid number for cost or usage.");
+        return;
+      }
+    }
+
     setLocalFormData({ ...localFormData, [name]: value });
+    setError(null); // Clear error if valid input
   };
 
-  // Save changes and update parent state
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsEditing(false);
+    onSave(localFormData); // Call the parent's handleSaveReport
     setFormData(localFormData); // Sync changes to parent
   };
 
-  // Cancel editing and revert to parent-provided data
   const handleCancel = () => {
     setIsEditing(false);
-    setLocalFormData(formData); // Reset to parent state
+    setLocalFormData(formData);
   };
 
   const handleEdit = () => {
@@ -122,8 +131,9 @@ const ReportData = ({ formData, setFormData, resetFormData }) => {
               type="button"
               onClick={handleSave}
               className="py-2 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-800"
+              disabled={saving}
             >
-              Save
+              {saving ? "Saving..." : "Save"}
             </button>
             <button
               type="button"
@@ -134,6 +144,7 @@ const ReportData = ({ formData, setFormData, resetFormData }) => {
             </button>
           </div>
         )}
+        {error && <p className="text-red-500">{error}</p>}
       </form>
     </div>
   );

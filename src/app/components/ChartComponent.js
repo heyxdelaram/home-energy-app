@@ -24,6 +24,10 @@ ChartJS.register(
 );
 
 function ChartComponent({ chartData }) {
+  if (chartData.labels.length === 0 || chartData.datasets.length === 0) {
+    return <div>No data available for the chart.</div>;
+  }
+
   return (
     <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
       <h2>Report</h2>
@@ -31,5 +35,6 @@ function ChartComponent({ chartData }) {
     </div>
   );
 }
+
 
 export default ChartComponent;

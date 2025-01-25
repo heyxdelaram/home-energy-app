@@ -46,6 +46,7 @@ export default function Dashboard() {
   const [existingBills, setExistingBills] = useState([]);
   const [fetchedReports, setFetchedReports] = useState([]);
   const [lastReport, setLastReport] = useState({}); // State to hold the last report
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -165,6 +166,28 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  const handleSaveReport = async (formData) => {
+    try {
+      const { data, error } = await supabase
+        .from("bills")
+        .update({
+          cost: parseFloat(formData.cost),
+          usage: parseFloat(formData.usage),
+          date: formData.date,
+          bill_type: formData.billType,
+        })
+        .eq("id", lastReport.id); // Include the WHERE clause
+  
+      if (error) {
+        console.error("Error updating report:", error.message);
+      } else {
+        console.log("Report updated successfully:", data);
+      }
+    } catch (error) {
+      console.error("Error updating report:", error.message);
+    }
+  };
+
   const resetFormData = () => {
     setFormData({
       cost: "",
@@ -226,6 +249,7 @@ export default function Dashboard() {
               formData={formData}
               setFormData={setFormData}
               resetFormData={resetFormData}
+              onSave={handleSaveReport}
             />
             {/* Chart Section */}
             <ChartComponent chartData={chartData} />
