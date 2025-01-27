@@ -48,6 +48,8 @@ export default function Dashboard() {
   const [lastReport, setLastReport] = useState({}); // State to hold the last report
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false); // State to track if editing
+
+
   const handleAddBill = async () => {
     try {
       // Validate form data
@@ -294,16 +296,17 @@ export default function Dashboard() {
           addBill={handleAddBill}
         />
       )}
-      <div className="flex h-screen bg-white">
+      <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white">
         {/* Sidebar */}
-        <Sidebar isOpen={false} setIsOpen={() => {}} />
+        <Sidebar/>
 
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-8">
           {/* Header */}
           <Header user={user} />
 
-          <div className="grid text-black grid-cols-1 lg:grid-cols-6 gap-8">
+
+          <div className="grid text-black grid-cols-1 xl:grid-cols-6 lg:gap-8">
             {/* Report Data Display Section */}
             <ReportData
               formData={formData}
@@ -313,17 +316,19 @@ export default function Dashboard() {
               isEditing={isEditing}
               onEdit={handleEditReport}
               onCancelEdit={handleCancelEdit}
-            />
+              />
             {/* Chart Section */}
             <ChartComponent chartData={chartData} />
           </div>
-        </main>
+          </main>
         {/* Reports Section */}
+
         <ReportsList
           setIsModalOpen={setIsModalOpen}
           reports={fetchedReports}
           user={user} // fetchedReports is an array of reports from Supabase
-        />
+          />
+
       </div>
     </>
   );

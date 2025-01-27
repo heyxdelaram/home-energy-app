@@ -20,7 +20,7 @@ const ReportsList = ({ setIsModalOpen, reports }) => {
     }, {});
 
   return (
-    <div className="bg-gray-100 text-black rounded-xl m-4 p-6 w-1/6">
+    <div className="bg-gray-100 text-black rounded-xl lg:m-4 p-6 lg:w-1/6 m-8">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-bold">Reports</h3>
         <button

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FaTachometerAlt,
   FaFileAlt,
@@ -8,25 +8,27 @@ import {
   FaFile,
 } from "react-icons/fa";
 
-function Sidebar({ isOpen, setIsOpen }) {
+function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <>
       {!isOpen && (
-        <nav className="bg-white w-full lg:hidden p-2 text-gray-800 fixed z-50">
-          <button onClick={() => setIsOpen(!isOpen)}>☰</button>
+        <nav className="bg-white w-full lg:hidden left-4 p-2 font-extrabold text-gray-800 fixed z-40">
+          <button onClick={() => setIsOpen(true)}>☰</button>
         </nav>
       )}
       {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsOpen(false)} // Close when clicking outside
+        ></div>
+      )}
+      {/**Sidebar Menu*/}
       <div
-        className={` inset-0 bg-black bg-opacity-50 z-40 transition-opacity ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        } `}
-        onClick={() => setIsOpen(false)} // Close when clicking outside
-      ></div>
-      <div
-        className={`fixed top-0 left-0 w-64 bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
+        className={`fixed top-0 left-0 h-full w-fixed bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
           isOpen ? "translate-x-0" : "-translate-x-full "
-        } lg:translate-x-0 lg:static lg:w-48 lg:pt-24`}
+        } lg:translate-x-0 lg:static lg:w-48 pt-24 pb-24`}
       >
         <div className="space-y-2 ">
           <a
