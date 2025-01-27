@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
-const ReportsList = ({ setIsModalOpen, reports }) => {
+const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // Group reports by month
@@ -64,6 +64,7 @@ const ReportsList = ({ setIsModalOpen, reports }) => {
                 <button
                   key={index}
                   className="w-full flex items-center justify-between my-2 p-4 bg-green-600 rounded-xl hover:bg-gray-200"
+                  onClick={()=>onReportClick(report.bill_type, new Date(report.date))}
                 >
                   <span>{report.bill_type}</span>
                   {/* <span>{new Date(report.date).toLocaleTimeString()}</span> */}

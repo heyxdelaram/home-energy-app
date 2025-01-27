@@ -39,7 +39,7 @@ export default function Summary({selectedMonth, fetchedReports, lastReport, setS
       
       return(
         <div className="summary-message">
-  <p>{summary} hi</p>
+  <p>{summary} </p>
 </div>
       );
 }

@@ -285,7 +285,62 @@ export default function Dashboard() {
       billType: "",
     });
   };
-
+  const handleReportClick = (billType, selectedDate) => {
+    const selectedMonth = selectedDate.getMonth();
+    const selectedYear = selectedDate.getFullYear();
+  
+    // Filter reports for the last 3 months of the selected bill type
+    const filteredReports = fetchedReports.filter((report) => {
+      const reportDate = new Date(report.date);
+      const reportMonth = reportDate.getMonth();
+      const reportYear = reportDate.getFullYear();
+  
+      // Check if the report falls within the last 3 months
+      const isSameYear = reportYear === selectedYear && reportMonth <= selectedMonth && reportMonth >= selectedMonth - 2;
+      const isPreviousYear =
+        reportYear === selectedYear - 1 &&
+        selectedMonth < 2 &&
+        reportMonth >= 12 - (2 - selectedMonth);
+  
+      return report.bill_type === billType && (isSameYear || isPreviousYear);
+    });
+  // If there are filtered reports, set form data to the most recent one
+  if (filteredReports.length > 0) {
+    const latestReport = filteredReports[0]; // Assuming you want to autofill with the latest one
+    setFormData({
+      cost: latestReport.cost.toString(),
+      usage: latestReport.usage.toString(),
+      date: latestReport.date,
+      billType: latestReport.bill_type,
+    });
+  }
+    // Update chart data
+    const labels = filteredReports.map((report) =>
+      new Date(report.date).toLocaleString("default", { month: "short", year: "numeric" })
+    );
+  
+    const usageData = filteredReports.map((report) => report.usage || 0);
+    const costData = filteredReports.map((report) => report.cost || 0);
+  
+    setChartData({
+      labels,
+      datasets: [
+        {
+          label: "Usage",
+          data: usageData,
+          borderColor: "#2196F3",
+          backgroundColor: "rgba(33, 150, 243, 0.2)",
+        },
+        {
+          label: "Cost",
+          data: costData,
+          borderColor: "#4CAF50",
+          backgroundColor: "rgba(76, 175, 80, 0.2)",
+        },
+      ],
+    });
+  };
+  
   return (
     <>
       {/* Modal */}
@@ -295,7 +350,7 @@ export default function Dashboard() {
           formData={formData}
           setFormData={setFormData}
           setIsModalOpen={setIsModalOpen}
-          existingBills={existingBills}
+          existingBills={fetchedReports}
           addBill={handleAddBill}
         />
       )}
@@ -330,9 +385,10 @@ export default function Dashboard() {
           setIsModalOpen={setIsModalOpen}
           reports={fetchedReports}
           user={user} // fetchedReports is an array of reports from Supabase
+          onReportClick={handleReportClick}
           />
-
-<Summary selectedMonth={selectedMonth} fetchedReports = {fetchedReports} lastReport={lastReport} setSummary={setSummary} summary={summary}/>
+{/**TODO fix connection */}
+{/* <Summary selectedMonth={selectedMonth} fetchedReports = {fetchedReports} lastReport={lastReport} setSummary={setSummary} summary={summary}/> */}
 
       </div>
     </>
