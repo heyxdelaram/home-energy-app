@@ -26,8 +26,8 @@ function Sidebar() {
       )}
       {/**Sidebar Menu*/}
       <div
-        className={`fixed top-0 left-0 h-full w-fixed bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
-          isOpen ? "translate-x-0" : "-translate-x-full "
+        className={`fixed top-0 left-0 w-fixed bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
+          isOpen ? "translate-x-0 h-full" : "-translate-x-full "
         } lg:translate-x-0 lg:static lg:w-48 pt-24 pb-24`}
       >
         <div className="space-y-2 ">
