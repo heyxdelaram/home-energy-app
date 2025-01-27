@@ -32,6 +32,9 @@ import Header from "../components/Header";
 import ChartComponent from "../components/ChartComponent";
 import ReportData from "../components/ReportData";
 import ReportsList from "../components/ReportsList";
+import OpenAI from "openai";
+import Summary from "../components/Summary";
+
 
 export default function Dashboard() {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
@@ -46,10 +49,10 @@ export default function Dashboard() {
   const [existingBills, setExistingBills] = useState([]);
   const [fetchedReports, setFetchedReports] = useState([]);
   const [lastReport, setLastReport] = useState({}); // State to hold the last report
-  const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false); // State to track if editing
-
-
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth()); // Default to current month
+  const [summary, setSummary] = useState(""); // To hold the summary message
+  
   const handleAddBill = async () => {
     try {
       // Validate form data
@@ -328,6 +331,8 @@ export default function Dashboard() {
           reports={fetchedReports}
           user={user} // fetchedReports is an array of reports from Supabase
           />
+
+<Summary selectedMonth={selectedMonth} fetchedReports = {fetchedReports} lastReport={lastReport} setSummary={setSummary} summary={summary}/>
 
       </div>
     </>
