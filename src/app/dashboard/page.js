@@ -388,7 +388,7 @@ export default function Dashboard() {
           onReportClick={handleReportClick}
           />
 {/**TODO fix connection */}
-{/* <Summary selectedMonth={selectedMonth} fetchedReports = {fetchedReports} lastReport={lastReport} setSummary={setSummary} summary={summary}/> */}
+<Summary selectedMonth={selectedMonth} fetchedReports = {fetchedReports} lastReport={lastReport} setSummary={setSummary} summary={summary}/>
 
       </div>
     </>

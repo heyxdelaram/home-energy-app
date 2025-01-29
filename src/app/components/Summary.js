@@ -12,6 +12,7 @@ export default function Summary({selectedMonth, fetchedReports, lastReport, setS
             const reportDate = new Date(report.date);
             return reportDate.getMonth() === selectedMonth && reportDate.getFullYear() === new Date().getFullYear();
           });
+
       
           const goalUsage = lastReport.goal_usage || 0;
 
@@ -22,6 +23,8 @@ export default function Summary({selectedMonth, fetchedReports, lastReport, setS
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ reports: filteredReports, goalUsage }),
           });
+
+          console.log(`response ${response}`)
       
           if (!response.ok) {
             throw new Error("Failed to fetch analysis");
