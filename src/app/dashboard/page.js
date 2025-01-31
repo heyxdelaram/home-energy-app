@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Chart as ChartJS,
@@ -35,7 +35,6 @@ import ReportsList from "../components/ReportsList";
 import OpenAI from "openai";
 import Summary from "../components/Summary";
 
-
 export default function Dashboard() {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,26 +51,29 @@ export default function Dashboard() {
   const [isEditing, setIsEditing] = useState(false); // State to track if editing
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth()); // Default to current month
   const [summary, setSummary] = useState(""); // To hold the summary message
-  
+
   const handleAddBill = async () => {
     try {
       // Validate form data
-      if (!formData.billType || !formData.cost || !formData.usage || !formData.date) {
+      if (
+        !formData.billType ||
+        !formData.cost ||
+        !formData.usage ||
+        !formData.date
+      ) {
         alert("Please fill in all fields.");
         return;
       }
-  
+
       // Save the new bill (example using Supabase)
-      const { error } = await supabase
-        .from("bills")
-        .insert({
-          bill_type: formData.billType,
-          cost: parseFloat(formData.cost),
-          usage: parseFloat(formData.usage),
-          date: formData.date,
-          user_id: user.id, // Replace with actual user ID
-        });
-  
+      const { error } = await supabase.from("bills").insert({
+        bill_type: formData.billType,
+        cost: parseFloat(formData.cost),
+        usage: parseFloat(formData.usage),
+        date: formData.date,
+        user_id: user.id, // Replace with actual user ID
+      });
+
       if (error) {
         console.error("Error saving bill:", error.message);
         alert("Failed to save the bill.");
@@ -84,18 +86,19 @@ export default function Dashboard() {
       console.error("Error:", error.message);
     }
   };
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch user data
-        const { data: userData, error: userError } = await supabase.auth.getUser();
+        const { data: userData, error: userError } =
+          await supabase.auth.getUser();
 
         if (userError) {
           console.error("Error fetching user:", userError.message);
           return;
         }
-        
+
         setUser(userData.user);
 
         // Fetch last report with ID
@@ -129,7 +132,10 @@ export default function Dashboard() {
           .eq("user_id", userData.user.id);
 
         if (allReports.error) {
-          console.error("Error fetching all reports:", allReports.error.message);
+          console.error(
+            "Error fetching all reports:",
+            allReports.error.message
+          );
           return;
         } else {
           console.log("All Reports Data:", allReports.data);
@@ -144,7 +150,12 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (fetchedReports.length > 0 && lastReport && lastReport.bill_type && lastReport.date) {
+    if (
+      fetchedReports.length > 0 &&
+      lastReport &&
+      lastReport.bill_type &&
+      lastReport.date
+    ) {
       const filteredReports = fetchedReports.filter((report) => {
         const reportDate = new Date(report.date);
         const lastReportDate = new Date(lastReport.date);
@@ -173,14 +184,25 @@ export default function Dashboard() {
       });
 
       if (filteredReports.length > 0) {
-        const labels = filteredReports.map((report) => {
-          const date = new Date(report.date);
-          return date.toLocaleString("default", { month: "short", year: "numeric" });
+        const sortedReports = filteredReports.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateA - dateB; // Sort ascending order by date
         });
 
-        const usageData = filteredReports.map((report) => report.usage || 0);
-        const costData = filteredReports.map((report) => report.cost || 0);
-        const goalUsageData = filteredReports.map((report) => report.goal_usage || 0);
+        const labels = sortedReports.map((report) => {
+          const date = new Date(report.date);
+          return date.toLocaleString("default", {
+            month: "short",
+            year: "numeric",
+          });
+        });
+
+        const usageData = sortedReports.map((report) => report.usage || 0);
+        const costData = sortedReports.map((report) => report.cost || 0);
+        const goalUsageData = sortedReports.map(
+          (report) => report.goal_usage || 0
+        );
 
         setChartData({
           labels,
@@ -209,65 +231,76 @@ export default function Dashboard() {
     }
   }, [fetchedReports, lastReport]);
 
-  const handleSaveReport = useCallback(async (formData) => {
-    try {
-      if (!formData.cost || !formData.usage || !formData.date || !formData.billType) {
-        console.error("One or more form fields are empty.");
-        return;
-      }
+  const handleSaveReport = useCallback(
+    async (formData) => {
+      try {
+        if (
+          !formData.cost ||
+          !formData.usage ||
+          !formData.date ||
+          !formData.billType
+        ) {
+          console.error("One or more form fields are empty.");
+          return;
+        }
 
-      if (!lastReport.id) {
-        console.error("Last report ID is undefined.");
-        return;
-      }
+        if (!lastReport.id) {
+          console.error("Last report ID is undefined.");
+          return;
+        }
 
-      // Update the report
-      const { error } = await supabase
-        .from("bills")
-        .update({
-          cost: parseFloat(formData.cost),
-          usage: parseFloat(formData.usage),
-          date: formData.date,
-          bill_type: formData.billType,
-        })
-        .eq("id", lastReport.id);
-
-      if (error) {
-        console.error("Error updating report:", error.message);
-      } else {
-        console.log("Report updated successfully.");
-
-        // Fetch the updated report
-        const { data: updatedReport, error: fetchError } = await supabase
+        // Update the report
+        const { error } = await supabase
           .from("bills")
-          .select("id, date, usage, cost, goal_usage, bill_type")
+          .update({
+            cost: parseFloat(formData.cost),
+            usage: parseFloat(formData.usage),
+            date: formData.date,
+            bill_type: formData.billType,
+          })
           .eq("id", lastReport.id);
 
-        if (fetchError) {
-          console.error("Error fetching updated report:", fetchError.message);
+        if (error) {
+          console.error("Error updating report:", error.message);
         } else {
-          console.log("Updated Report Data:", updatedReport[0]);
-          setLastReport(updatedReport[0]); // Update the last report state
+          console.log("Report updated successfully.");
 
-          // Fetch all reports again to update chart data
-          const allReports = await supabase
+          // Fetch the updated report
+          const { data: updatedReport, error: fetchError } = await supabase
             .from("bills")
-            .select("date, usage, cost, goal_usage, bill_type")
-            .eq("user_id", user.id);
+            .select("id, date, usage, cost, goal_usage, bill_type")
+            .eq("id", lastReport.id);
 
-          if (allReports.error) {
-            console.error("Error fetching all reports:", allReports.error.message);
+          if (fetchError) {
+            console.error("Error fetching updated report:", fetchError.message);
           } else {
-            setFetchedReports([...allReports.data]);
-          }
+            console.log("Updated Report Data:", updatedReport[0]);
+            setLastReport(updatedReport[0]); // Update the last report state
 
-          setIsEditing(false); // Reset editing state
+            // Fetch all reports again to update chart data
+            const allReports = await supabase
+              .from("bills")
+              .select("date, usage, cost, goal_usage, bill_type")
+              .eq("user_id", user.id);
+
+            if (allReports.error) {
+              console.error(
+                "Error fetching all reports:",
+                allReports.error.message
+              );
+            } else {
+              setFetchedReports([...allReports.data]);
+            }
+
+            setIsEditing(false); // Reset editing state
+          }
         }
+      } catch (error) {
+        console.error("Error updating report:", error.message);
       }
-    } catch (error) {
-      console.error("Error updating report:", error.message);
-    }
-  }, [lastReport, user]);
+    },
+    [lastReport, user]
+  );
 
   const handleEditReport = () => {
     setIsEditing(true);
@@ -288,40 +321,46 @@ export default function Dashboard() {
   const handleReportClick = (billType, selectedDate) => {
     const selectedMonth = selectedDate.getMonth();
     const selectedYear = selectedDate.getFullYear();
-  
+
     // Filter reports for the last 3 months of the selected bill type
     const filteredReports = fetchedReports.filter((report) => {
       const reportDate = new Date(report.date);
       const reportMonth = reportDate.getMonth();
       const reportYear = reportDate.getFullYear();
-  
+
       // Check if the report falls within the last 3 months
-      const isSameYear = reportYear === selectedYear && reportMonth <= selectedMonth && reportMonth >= selectedMonth - 2;
+      const isSameYear =
+        reportYear === selectedYear &&
+        reportMonth <= selectedMonth &&
+        reportMonth >= selectedMonth - 2;
       const isPreviousYear =
         reportYear === selectedYear - 1 &&
         selectedMonth < 2 &&
         reportMonth >= 12 - (2 - selectedMonth);
-  
+
       return report.bill_type === billType && (isSameYear || isPreviousYear);
     });
-  // If there are filtered reports, set form data to the most recent one
-  if (filteredReports.length > 0) {
-    const latestReport = filteredReports[0]; // Assuming you want to autofill with the latest one
-    setFormData({
-      cost: latestReport.cost.toString(),
-      usage: latestReport.usage.toString(),
-      date: latestReport.date,
-      billType: latestReport.bill_type,
-    });
-  }
+    // If there are filtered reports, set form data to the most recent one
+    if (filteredReports.length > 0) {
+      const latestReport = filteredReports[0]; // Assuming you want to autofill with the latest one
+      setFormData({
+        cost: latestReport.cost.toString(),
+        usage: latestReport.usage.toString(),
+        date: latestReport.date,
+        billType: latestReport.bill_type,
+      });
+    }
     // Update chart data
     const labels = filteredReports.map((report) =>
-      new Date(report.date).toLocaleString("default", { month: "short", year: "numeric" })
+      new Date(report.date).toLocaleString("default", {
+        month: "short",
+        year: "numeric",
+      })
     );
-  
+
     const usageData = filteredReports.map((report) => report.usage || 0);
     const costData = filteredReports.map((report) => report.cost || 0);
-  
+
     setChartData({
       labels,
       datasets: [
@@ -340,7 +379,7 @@ export default function Dashboard() {
       ],
     });
   };
-  
+
   return (
     <>
       {/* Modal */}
@@ -356,13 +395,12 @@ export default function Dashboard() {
       )}
       <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white">
         {/* Sidebar */}
-        <Sidebar/>
+        <Sidebar />
 
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-8">
           {/* Header */}
           <Header user={user} />
-
 
           <div className="grid text-black grid-cols-1 xl:grid-cols-6 lg:gap-8">
             {/* Report Data Display Section */}
@@ -374,11 +412,11 @@ export default function Dashboard() {
               isEditing={isEditing}
               onEdit={handleEditReport}
               onCancelEdit={handleCancelEdit}
-              />
+            />
             {/* Chart Section */}
             <ChartComponent chartData={chartData} />
           </div>
-          </main>
+        </main>
         {/* Reports Section */}
 
         <ReportsList
@@ -386,10 +424,15 @@ export default function Dashboard() {
           reports={fetchedReports}
           user={user} // fetchedReports is an array of reports from Supabase
           onReportClick={handleReportClick}
-          />
-{/**TODO fix connection */}
-<Summary selectedMonth={selectedMonth} fetchedReports = {fetchedReports} lastReport={lastReport} setSummary={setSummary} summary={summary}/>
-
+        />
+        {/**TODO fix connection */}
+        <Summary
+          selectedMonth={selectedMonth}
+          fetchedReports={fetchedReports}
+          lastReport={lastReport}
+          setSummary={setSummary}
+          summary={summary}
+        />
       </div>
     </>
   );
