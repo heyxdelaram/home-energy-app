@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import {
   FaTachometerAlt,
@@ -71,6 +73,7 @@ function Sidebar() {
           <a
             href="#"
             className="flex items-center space-x-2 block text-m hover:text-green-800"
+            onClick={() => (window.location.href = "/settings")}
           >
             <FaCog color="green" /> {/* Settings Icon */}
             <span>Settings</span>

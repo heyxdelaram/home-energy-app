@@ -415,6 +415,13 @@ export default function Dashboard() {
             />
             {/* Chart Section */}
             <ChartComponent chartData={chartData} />
+            <Summary
+              selectedMonth={selectedMonth}
+              fetchedReports={fetchedReports}
+              lastReport={lastReport}
+              setSummary={setSummary}
+              summary={summary}
+            />
           </div>
         </main>
         {/* Reports Section */}
@@ -426,13 +433,6 @@ export default function Dashboard() {
           onReportClick={handleReportClick}
         />
         {/**TODO fix connection */}
-        <Summary
-          selectedMonth={selectedMonth}
-          fetchedReports={fetchedReports}
-          lastReport={lastReport}
-          setSummary={setSummary}
-          summary={summary}
-        />
       </div>
     </>
   );
