@@ -1,32 +1,24 @@
 import OpenAI from "openai";
+import { report } from "process";
 
-const configuration = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
+const openai = new OpenAI({
+  apiKey:,
 });
-
-const openai = new OpenAI(configuration);
 
 export async function POST(req) {
   try {
-    const { reports, goalUsage } = await req.json();
+    // ✅ Parse JSON safely
+    const requestBody = await req.json();
+    const prompt = requestBody.prompt;
 
-    // Validate input data
-    if (!reports || !Array.isArray(reports) || reports.length === 0) {
-      return new Response(JSON.stringify({ error: "Invalid reports data" }), { status: 400 });
+    if (!prompt) {
+      return new Response(
+        JSON.stringify({ error: "Missing prompt in request" }),
+        { status: 400 }
+      );
     }
 
-    // Calculate total usage
-    const totalUsage = reports.reduce((acc, report) => acc + (report.usage || 0), 0);
-
-    const prompt = `
-      Analyze the following data:
-      Reports: ${JSON.stringify(reports)}
-      Goal Usage: ${goalUsage}
-      Total Usage: ${totalUsage}
-
-      Provide a short summary comparing the total usage with the goal usage.
-    `;
-
+    // ✅ Call OpenAI API
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -35,10 +27,26 @@ export async function POST(req) {
       ],
     });
 
-    const summary = response.data.choices[0].message.content;
+    // ✅ Debug: Log OpenAI response
+    console.log("OpenAI Response:", JSON.stringify(response, null, 2));
+
+    // ✅ Ensure choices[0].message.content exists
+    const summary = response.choices?.[0]?.message?.content;
+    if (!summary) {
+      return new Response(
+        JSON.stringify({ error: "Unexpected OpenAI response format" }),
+        { status: 500 }
+      );
+    }
+
     return new Response(JSON.stringify({ summary }), { status: 200 });
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: "Failed to analyze reports" }), { status: 500 });
+    console.error("Error in API function:", error);
+
+    // ✅ Return detailed error messages
+    return new Response(
+      JSON.stringify({ error: error.message || "Failed to analyze reports" }),
+      { status: 500 }
+    );
   }
 }
