@@ -12,7 +12,6 @@ export default function Summary({
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Only run analysis if a report has been selected.
     if (!selectedReportCriteria) {
       setSummary("");
       return;
@@ -25,7 +24,7 @@ export default function Summary({
         setLoading(true);
         setError("");
 
-        // Filter reports that match the selected bill type, month, and year
+        // Filter reports matching the selected bill type, month, and year
         const filteredReports = fetchedReports.filter((report) => {
           const reportDate = new Date(report.date);
           return (
@@ -35,11 +34,6 @@ export default function Summary({
           );
         });
 
-        console.log(
-          "Filtered Reports:",
-          JSON.stringify(filteredReports, null, 2)
-        );
-
         if (filteredReports.length === 0) {
           console.warn("No reports found for the selected criteria.");
           setSummary("No reports available for the selected criteria.");
@@ -47,16 +41,27 @@ export default function Summary({
           return;
         }
 
-        // Create a prompt that can include the bill type and a human-readable month/year.
-        const prompt = `Please analyze the following report data for bill type ${billType} in ${
-          month + 1
-        }/${year}:`;
+        // Clean up report text and ensure it's readable
+        const reportTexts = filteredReports
+          .map(
+            (report) =>
+              `Date: ${report.date}, Usage: ${report.usage}, Cost: ${report.cost}`
+          )
+          .join("\n");
+
+        // If text is too long, truncate it to prevent token limit issues
+        const MAX_LENGTH = 1000; // Example length limit
+        const truncatedText = reportTexts.length > MAX_LENGTH
+          ? reportTexts.substring(0, MAX_LENGTH)
+          : reportTexts;
+
+        // Build a prompt with report details
+        const prompt = `Please summarize the following report data for bill type ${billType} in ${month + 1}/${year}:\n${truncatedText}`;
 
         const response = await fetch("/api/analyze-reports", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            reports: filteredReports,
             prompt,
           }),
         });
@@ -76,9 +81,7 @@ export default function Summary({
         }
       } catch (error) {
         console.error("Error analyzing reports:", error);
-        setError(
-          error.message || "Something went wrong while analyzing reports."
-        );
+        setError(error.message || "Something went wrong while analyzing reports.");
       } finally {
         setLoading(false);
       }
@@ -88,7 +91,7 @@ export default function Summary({
   }, [selectedReportCriteria, fetchedReports, setSummary]);
 
   return (
-    <div className="summary-message">
+    <div className="summary-message w-full">
       {loading && <p>Loading analysis...</p>}
       {error && <p className="error-text">{error}</p>}
       <p>{summary}</p>

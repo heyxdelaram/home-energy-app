@@ -1,12 +1,4 @@
-import OpenAI from "openai";
-
-if (!process.env.OPENAI_API_KEY) {
-  console.error("Missing OPENAI_API_KEY environment variable!");
-}
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { Sumana } from "next/font/google";
 
 export async function POST(req) {
   try {
@@ -22,20 +14,36 @@ export async function POST(req) {
       );
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content: prompt },
-      ],
+    // Send the request to Hugging Face
+    const hfResponse = await fetch("https://api-inference.huggingface.co/models/sshleifer/distilbart-cnn-12-6", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ inputs: prompt }),
     });
 
-    console.log("OpenAI Response:", JSON.stringify(response, null, 2));
+    // Check if the response is successful
+    if (!hfResponse.ok) {
+      const errorText = await hfResponse.text();
+      console.error("Hugging Face API error:", errorText);
+      return new Response(
+        JSON.stringify({ error: errorText }),
+        { status: hfResponse.status }
+      );
+    }
 
-    const summary = response.choices?.[0]?.message?.content;
+    // Parse the response JSON
+    const data = await hfResponse.json();
+    console.log("Hugging Face Response:", JSON.stringify(data, null, 2)); // Log response to see structure
+
+    // Check if response contains expected summary field
+    const summary = data?.[0]?.summary_text || data?.generated_text || data?.text;
+    console.log(summary)
     if (!summary) {
       return new Response(
-        JSON.stringify({ error: "Unexpected OpenAI response format" }),
+        JSON.stringify({ error: "Unexpected response format" }),
         { status: 500 }
       );
     }
@@ -43,15 +51,6 @@ export async function POST(req) {
     return new Response(JSON.stringify({ summary }), { status: 200 });
   } catch (error) {
     console.error("Error in API function:", error);
-    if (error.code === "insufficient_quota") {
-      return new Response(
-        JSON.stringify({
-          error:
-            "Quota exceeded. Please check your OpenAI plan and billing details.",
-        }),
-        { status: 429 }
-      );
-    }
     return new Response(
       JSON.stringify({ error: error.message || "Failed to analyze reports" }),
       { status: 500 }

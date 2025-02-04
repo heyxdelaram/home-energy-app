@@ -35,7 +35,13 @@ import ReportsList from "../components/ReportsList";
 import Summary from "../components/Summary";
 
 export default function Dashboard() {
-  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [
+      { label: "Usage", data: [] },
+      { label: "Cost", data: [] }
+    ]
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     cost: "",
@@ -47,7 +53,7 @@ export default function Dashboard() {
   const [fetchedReports, setFetchedReports] = useState([]);
   const [lastReport, setLastReport] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-  // This state holds the criteria for the selected report (bill type, month, year)
+  // Holds the criteria for the selected report (bill type, month, year)
   const [selectedReportCriteria, setSelectedReportCriteria] = useState(null);
   const [summary, setSummary] = useState("");
 
@@ -221,15 +227,14 @@ export default function Dashboard() {
     });
   };
 
-  // When a report is clicked, we set the criteria (bill type, month, year)
-  // which the Summary component will use to filter reports.
+  // When a report is clicked, set the criteria (bill type, month, year)
   const handleReportClick = (billType, selectedDate) => {
     const month = selectedDate.getMonth(); // zero-indexed
     const year = selectedDate.getFullYear();
 
     setSelectedReportCriteria({ billType, month, year });
 
-    // (Optional) Update chart and form data based on related reports
+    // Update chart and form data based on related reports
     const filteredReports = fetchedReports.filter((report) => {
       const reportDate = new Date(report.date);
       const reportMonth = reportDate.getMonth();
@@ -246,7 +251,7 @@ export default function Dashboard() {
         reportMonth >= 12 - (2 - month);
 
       return report.bill_type === billType && (isSameYear || isPreviousYear);
-    });
+    }) || [];
 
     if (filteredReports.length > 0) {
       const latestReport = filteredReports[0];
@@ -314,11 +319,15 @@ export default function Dashboard() {
               onCancelEdit={handleCancelEdit}
             />
             <ChartComponent chartData={chartData} />
-            <Summary
+          </div>
+          <div className="text-green-800 font-semibold">
+
+            <Summary 
               selectedReportCriteria={selectedReportCriteria}
               fetchedReports={fetchedReports}
               setSummary={setSummary}
               summary={summary}
+              chartData={chartData}
             />
           </div>
         </main>

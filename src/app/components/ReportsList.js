@@ -4,7 +4,6 @@ import { FaPlus } from "react-icons/fa";
 const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  // Group reports by month for the selected year
   const groupedReports = reports
     .filter((report) => {
       const reportYear = new Date(report.date).getFullYear();
@@ -31,12 +30,8 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
         </button>
       </div>
 
-      {/* Year Selector */}
       <div className="flex flex-col items-center">
-        <label
-          htmlFor="year"
-          className="block w-full text-sm font-semibold text-gray-600 mb-2"
-        >
+        <label htmlFor="year" className="block w-full text-sm font-semibold text-gray-600 mb-2">
           Select Year
         </label>
         <select
@@ -52,16 +47,13 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
         </select>
       </div>
 
-      {/* Reports List */}
       <div className="space-y-4 text-white">
         {Object.keys(groupedReports).length === 0 ? (
           <p className="text-center text-gray-500">No reports available</p>
         ) : (
           Object.entries(groupedReports).map(([month, reports]) => (
             <div key={month} className="mb-4">
-              <h4 className="text-md font-semibold text-gray-800 mb-2">
-                {month}
-              </h4>
+              <h4 className="text-md font-semibold text-gray-800 mb-2">{month}</h4>
               {reports.map((report, index) => (
                 <button
                   key={index}
