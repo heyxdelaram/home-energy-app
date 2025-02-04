@@ -6,7 +6,7 @@ export default function Summary({
   selectedReportCriteria,
   fetchedReports,
   setSummary,
-  summary,
+  summary
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,18 +19,22 @@ export default function Summary({
 
     const { billType, month, year } = selectedReportCriteria;
 
-    const analyzeReports = async () => {
+    const analyzeReports = () => {
       try {
         setLoading(true);
         setError("");
 
-        // Filter reports matching the selected bill type, month, and year
+        // Get the start date for filtering (3 months back)
+        const startDate = new Date(year, month - 2, 1); // Start from two months before
+        const endDate = new Date(year, month + 1, 0); // End of the selected month
+
+        // Filter reports matching the selected bill type and date range
         const filteredReports = fetchedReports.filter((report) => {
           const reportDate = new Date(report.date);
           return (
             report.bill_type === billType &&
-            reportDate.getMonth() === month &&
-            reportDate.getFullYear() === year
+            reportDate >= startDate &&
+            reportDate <= endDate
           );
         });
 
@@ -41,44 +45,36 @@ export default function Summary({
           return;
         }
 
-        // Clean up report text and ensure it's readable
-        const reportTexts = filteredReports
-          .map(
-            (report) =>
-              `Date: ${report.date}, Usage: ${report.usage}, Cost: ${report.cost}`
-          )
-          .join("\n");
+        // Analyze the filtered reports
+        let totalUsage = 0;
+        let totalCost = 0;
 
-        // If text is too long, truncate it to prevent token limit issues
-        const MAX_LENGTH = 1000; // Example length limit
-        const truncatedText = reportTexts.length > MAX_LENGTH
-          ? reportTexts.substring(0, MAX_LENGTH)
-          : reportTexts;
-
-        // Build a prompt with report details
-        const prompt = `Please summarize the following report data for bill type ${billType} in ${month + 1}/${year}:\n${truncatedText}`;
-
-        const response = await fetch("/api/analyze-reports", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt,
-          }),
+        filteredReports.forEach((report) => {
+          totalUsage += report.usage || 0;
+          totalCost += report.cost || 0;
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Response Error:", errorText);
-          throw new Error("Failed to fetch analysis");
-        }
+        const averageUsage = (totalUsage / filteredReports.length).toFixed(2);
+        const averageCost = (totalCost / filteredReports.length).toFixed(2);
 
-        const data = await response.json();
+        // Generate a meaningful summary
+        let generatedSummary = `In ${month + 1}/${year}, for ${billType}:\n`;
+        generatedSummary += `Total Usage: ${totalUsage} units\n`;
+        generatedSummary += `Total Cost: $${totalCost.toFixed(2)}\n`;
+        generatedSummary += `Average Usage: ${averageUsage} units\n`;
+        generatedSummary += `Average Cost: $${averageCost}\n`;
 
-        if (data?.summary) {
-          setSummary(data.summary);
+        // Check if goal usage was exceeded
+        let goalUsageExceededCount = filteredReports.filter(report => report.goal_usage && report.usage > report.goal_usage).length;
+
+        if (goalUsageExceededCount > 0) {
+          generatedSummary += `Warning: The goal usage was exceeded on ${goalUsageExceededCount} occasion(s).\n`;
+          generatedSummary += `Consider reviewing your usage habits to avoid higher costs.\n`;
         } else {
-          setError("Failed to retrieve a valid summary.");
+          generatedSummary += `Good job! The goal usage was not exceeded this month.\n`;
         }
+
+        setSummary(generatedSummary);
       } catch (error) {
         console.error("Error analyzing reports:", error);
         setError(error.message || "Something went wrong while analyzing reports.");
@@ -91,10 +87,10 @@ export default function Summary({
   }, [selectedReportCriteria, fetchedReports, setSummary]);
 
   return (
-    <div className="summary-message w-full">
+    <div className="summary-message w-full text-green-800 font-semibold ">
       {loading && <p>Loading analysis...</p>}
       {error && <p className="error-text">{error}</p>}
-      <p>{summary}</p>
+      <pre>{summary}</pre>
     </div>
   );
 }
