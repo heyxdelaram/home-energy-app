@@ -3,58 +3,61 @@
 import { useEffect, useState } from "react";
 
 export default function Summary({
-  selectedMonth,
+  selectedReportCriteria,
   fetchedReports,
-  lastReport,
   setSummary,
   summary,
 }) {
-  const [loading, setLoading] = useState(false); // For loading state
-  const [error, setError] = useState(""); // To handle errors
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const analyzeReports = async (selectedMonth) => {
-      try {
-        // Set loading state before sending the request
-        setLoading(true);
-        setError(""); // Reset error message on new request
+    // Only run analysis if a report has been selected.
+    if (!selectedReportCriteria) {
+      setSummary("");
+      return;
+    }
 
-        // Filter reports for the selected month
+    const { billType, month, year } = selectedReportCriteria;
+
+    const analyzeReports = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        // Filter reports that match the selected bill type, month, and year
         const filteredReports = fetchedReports.filter((report) => {
           const reportDate = new Date(report.date);
           return (
-            reportDate.getMonth() === selectedMonth &&
-            reportDate.getFullYear() === new Date().getFullYear()
+            report.bill_type === billType &&
+            reportDate.getMonth() === month &&
+            reportDate.getFullYear() === year
           );
         });
 
         console.log(
           "Filtered Reports:",
           JSON.stringify(filteredReports, null, 2)
-        ); // Log filtered reports
+        );
 
-        const goalUsage = lastReport.goal_usage || 0;
-
-        // Optional: add a prompt string here if needed
-        const prompt =
-          "Please analyze the following reports for usage analysis.";
-
-        // Handle case where no reports are found
         if (filteredReports.length === 0) {
-          console.warn("No reports found for the selected month.");
-          setSummary("No reports available for the selected month.");
-          setLoading(false); // Stop loading when done
-          return; // Exit early if no valid reports
+          console.warn("No reports found for the selected criteria.");
+          setSummary("No reports available for the selected criteria.");
+          setLoading(false);
+          return;
         }
 
-        // Send data to backend for analysis
-        const response = await fetch("../api/analyze-reports", {
+        // Create a prompt that can include the bill type and a human-readable month/year.
+        const prompt = `Please analyze the following report data for bill type ${billType} in ${
+          month + 1
+        }/${year}:`;
+
+        const response = await fetch("/api/analyze-reports", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             reports: filteredReports,
-            goalUsage,
-            prompt: prompt, // Add the missing prompt here
+            prompt,
           }),
         });
 
@@ -67,7 +70,7 @@ export default function Summary({
         const data = await response.json();
 
         if (data?.summary) {
-          setSummary(data.summary); // Display summary in your UI
+          setSummary(data.summary);
         } else {
           setError("Failed to retrieve a valid summary.");
         }
@@ -77,18 +80,17 @@ export default function Summary({
           error.message || "Something went wrong while analyzing reports."
         );
       } finally {
-        setLoading(false); // Stop loading after analysis
+        setLoading(false);
       }
     };
 
-    analyzeReports(selectedMonth);
-  }, [selectedMonth, fetchedReports, lastReport.goal_usage, setSummary]);
+    analyzeReports();
+  }, [selectedReportCriteria, fetchedReports, setSummary]);
 
   return (
     <div className="summary-message">
       {loading && <p>Loading analysis...</p>}
-      {error && <p className="error-text">{error}</p>}{" "}
-      {/* Display error message */}
+      {error && <p className="error-text">{error}</p>}
       <p>{summary}</p>
     </div>
   );

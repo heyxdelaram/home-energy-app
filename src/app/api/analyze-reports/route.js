@@ -1,15 +1,19 @@
 import OpenAI from "openai";
-import { report } from "process";
+
+if (!process.env.OPENAI_API_KEY) {
+  console.error("Missing OPENAI_API_KEY environment variable!");
+}
 
 const openai = new OpenAI({
-  apiKey:,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(req) {
   try {
-    // ✅ Parse JSON safely
+    console.log("API endpoint called");
     const requestBody = await req.json();
     const prompt = requestBody.prompt;
+    console.log("Received prompt:", prompt);
 
     if (!prompt) {
       return new Response(
@@ -18,19 +22,16 @@ export async function POST(req) {
       );
     }
 
-    // ✅ Call OpenAI API
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt },
       ],
     });
 
-    // ✅ Debug: Log OpenAI response
     console.log("OpenAI Response:", JSON.stringify(response, null, 2));
 
-    // ✅ Ensure choices[0].message.content exists
     const summary = response.choices?.[0]?.message?.content;
     if (!summary) {
       return new Response(
@@ -42,8 +43,15 @@ export async function POST(req) {
     return new Response(JSON.stringify({ summary }), { status: 200 });
   } catch (error) {
     console.error("Error in API function:", error);
-
-    // ✅ Return detailed error messages
+    if (error.code === "insufficient_quota") {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Quota exceeded. Please check your OpenAI plan and billing details.",
+        }),
+        { status: 429 }
+      );
+    }
     return new Response(
       JSON.stringify({ error: error.message || "Failed to analyze reports" }),
       { status: 500 }

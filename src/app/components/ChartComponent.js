@@ -36,5 +36,4 @@ function ChartComponent({ chartData }) {
   );
 }
 
-
 export default ChartComponent;

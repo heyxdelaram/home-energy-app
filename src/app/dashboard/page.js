@@ -32,7 +32,6 @@ import Header from "../components/Header";
 import ChartComponent from "../components/ChartComponent";
 import ReportData from "../components/ReportData";
 import ReportsList from "../components/ReportsList";
-import OpenAI from "openai";
 import Summary from "../components/Summary";
 
 export default function Dashboard() {
@@ -45,16 +44,15 @@ export default function Dashboard() {
     billType: "water",
   });
   const [user, setUser] = useState({});
-  const [existingBills, setExistingBills] = useState([]);
   const [fetchedReports, setFetchedReports] = useState([]);
-  const [lastReport, setLastReport] = useState({}); // State to hold the last report
-  const [isEditing, setIsEditing] = useState(false); // State to track if editing
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth()); // Default to current month
-  const [summary, setSummary] = useState(""); // To hold the summary message
+  const [lastReport, setLastReport] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  // This state holds the criteria for the selected report (bill type, month, year)
+  const [selectedReportCriteria, setSelectedReportCriteria] = useState(null);
+  const [summary, setSummary] = useState("");
 
   const handleAddBill = async () => {
     try {
-      // Validate form data
       if (
         !formData.billType ||
         !formData.cost ||
@@ -65,13 +63,12 @@ export default function Dashboard() {
         return;
       }
 
-      // Save the new bill (example using Supabase)
       const { error } = await supabase.from("bills").insert({
         bill_type: formData.billType,
         cost: parseFloat(formData.cost),
         usage: parseFloat(formData.usage),
         date: formData.date,
-        user_id: user.id, // Replace with actual user ID
+        user_id: user.id,
       });
 
       if (error) {
@@ -79,8 +76,8 @@ export default function Dashboard() {
         alert("Failed to save the bill.");
       } else {
         alert("Bill added successfully!");
-        setIsModalOpen(false); // Close modal after saving
-        setFormData({ billType: "", cost: "", usage: "", date: "" }); // Reset form
+        setIsModalOpen(false);
+        setFormData({ billType: "", cost: "", usage: "", date: "" });
       }
     } catch (error) {
       console.error("Error:", error.message);
@@ -90,7 +87,6 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch user data
         const { data: userData, error: userError } =
           await supabase.auth.getUser();
 
@@ -101,7 +97,6 @@ export default function Dashboard() {
 
         setUser(userData.user);
 
-        // Fetch last report with ID
         const { data, error } = await supabase
           .from("bills")
           .select("id, date, usage, cost, goal_usage, bill_type")
@@ -125,17 +120,13 @@ export default function Dashboard() {
           console.log("No last report found.");
         }
 
-        // Fetch all reports for chart data
         const allReports = await supabase
           .from("bills")
           .select("date, usage, cost, goal_usage, bill_type")
           .eq("user_id", userData.user.id);
 
         if (allReports.error) {
-          console.error(
-            "Error fetching all reports:",
-            allReports.error.message
-          );
+          console.error("Error fetching all reports:", allReports.error.message);
           return;
         } else {
           console.log("All Reports Data:", allReports.data);
@@ -148,88 +139,6 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (
-      fetchedReports.length > 0 &&
-      lastReport &&
-      lastReport.bill_type &&
-      lastReport.date
-    ) {
-      const filteredReports = fetchedReports.filter((report) => {
-        const reportDate = new Date(report.date);
-        const lastReportDate = new Date(lastReport.date);
-        const lastReportMonth = lastReportDate.getMonth();
-        const lastReportYear = lastReportDate.getFullYear();
-        const reportMonth = reportDate.getMonth();
-        const reportYear = reportDate.getFullYear();
-
-        // Filter for the last three months of the same bill type
-        if (report.bill_type === lastReport.bill_type) {
-          if (
-            reportYear === lastReportYear &&
-            reportMonth >= lastReportMonth - 3 &&
-            reportMonth <= lastReportMonth
-          ) {
-            return true;
-          } else if (
-            reportYear === lastReportYear - 1 &&
-            reportMonth >= 9 &&
-            reportMonth <= 11
-          ) {
-            return true;
-          }
-        }
-        return false;
-      });
-
-      if (filteredReports.length > 0) {
-        const sortedReports = filteredReports.sort((a, b) => {
-          const dateA = new Date(a.date);
-          const dateB = new Date(b.date);
-          return dateA - dateB; // Sort ascending order by date
-        });
-
-        const labels = sortedReports.map((report) => {
-          const date = new Date(report.date);
-          return date.toLocaleString("default", {
-            month: "short",
-            year: "numeric",
-          });
-        });
-
-        const usageData = sortedReports.map((report) => report.usage || 0);
-        const costData = sortedReports.map((report) => report.cost || 0);
-        const goalUsageData = sortedReports.map(
-          (report) => report.goal_usage || 0
-        );
-
-        setChartData({
-          labels,
-          datasets: [
-            {
-              label: "Usage",
-              data: usageData,
-              borderColor: "#2196F3",
-              backgroundColor: "rgba(33, 150, 243, 0.2)",
-            },
-            {
-              label: "Cost",
-              data: costData,
-              borderColor: "#4CAF50",
-              backgroundColor: "rgba(76, 175, 80, 0.2)",
-            },
-            {
-              label: "Goal Usage",
-              data: goalUsageData,
-              borderColor: "#FF9800",
-              backgroundColor: "rgba(255, 152, 0, 0.2)",
-            },
-          ],
-        });
-      }
-    }
-  }, [fetchedReports, lastReport]);
 
   const handleSaveReport = useCallback(
     async (formData) => {
@@ -249,7 +158,6 @@ export default function Dashboard() {
           return;
         }
 
-        // Update the report
         const { error } = await supabase
           .from("bills")
           .update({
@@ -264,8 +172,6 @@ export default function Dashboard() {
           console.error("Error updating report:", error.message);
         } else {
           console.log("Report updated successfully.");
-
-          // Fetch the updated report
           const { data: updatedReport, error: fetchError } = await supabase
             .from("bills")
             .select("id, date, usage, cost, goal_usage, bill_type")
@@ -275,24 +181,20 @@ export default function Dashboard() {
             console.error("Error fetching updated report:", fetchError.message);
           } else {
             console.log("Updated Report Data:", updatedReport[0]);
-            setLastReport(updatedReport[0]); // Update the last report state
+            setLastReport(updatedReport[0]);
 
-            // Fetch all reports again to update chart data
             const allReports = await supabase
               .from("bills")
               .select("date, usage, cost, goal_usage, bill_type")
               .eq("user_id", user.id);
 
             if (allReports.error) {
-              console.error(
-                "Error fetching all reports:",
-                allReports.error.message
-              );
+              console.error("Error fetching all reports:", allReports.error.message);
             } else {
               setFetchedReports([...allReports.data]);
             }
 
-            setIsEditing(false); // Reset editing state
+            setIsEditing(false);
           }
         }
       } catch (error) {
@@ -318,31 +220,36 @@ export default function Dashboard() {
       billType: "",
     });
   };
-  const handleReportClick = (billType, selectedDate) => {
-    const selectedMonth = selectedDate.getMonth();
-    const selectedYear = selectedDate.getFullYear();
 
-    // Filter reports for the last 3 months of the selected bill type
+  // When a report is clicked, we set the criteria (bill type, month, year)
+  // which the Summary component will use to filter reports.
+  const handleReportClick = (billType, selectedDate) => {
+    const month = selectedDate.getMonth(); // zero-indexed
+    const year = selectedDate.getFullYear();
+
+    setSelectedReportCriteria({ billType, month, year });
+
+    // (Optional) Update chart and form data based on related reports
     const filteredReports = fetchedReports.filter((report) => {
       const reportDate = new Date(report.date);
       const reportMonth = reportDate.getMonth();
       const reportYear = reportDate.getFullYear();
 
-      // Check if the report falls within the last 3 months
+      // Example: include reports for the last 3 months for this bill type
       const isSameYear =
-        reportYear === selectedYear &&
-        reportMonth <= selectedMonth &&
-        reportMonth >= selectedMonth - 2;
+        reportYear === year &&
+        reportMonth <= month &&
+        reportMonth >= month - 2;
       const isPreviousYear =
-        reportYear === selectedYear - 1 &&
-        selectedMonth < 2 &&
-        reportMonth >= 12 - (2 - selectedMonth);
+        reportYear === year - 1 &&
+        month < 2 &&
+        reportMonth >= 12 - (2 - month);
 
       return report.bill_type === billType && (isSameYear || isPreviousYear);
     });
-    // If there are filtered reports, set form data to the most recent one
+
     if (filteredReports.length > 0) {
-      const latestReport = filteredReports[0]; // Assuming you want to autofill with the latest one
+      const latestReport = filteredReports[0];
       setFormData({
         cost: latestReport.cost.toString(),
         usage: latestReport.usage.toString(),
@@ -350,14 +257,13 @@ export default function Dashboard() {
         billType: latestReport.bill_type,
       });
     }
-    // Update chart data
+
     const labels = filteredReports.map((report) =>
       new Date(report.date).toLocaleString("default", {
         month: "short",
         year: "numeric",
       })
     );
-
     const usageData = filteredReports.map((report) => report.usage || 0);
     const costData = filteredReports.map((report) => report.cost || 0);
 
@@ -382,28 +288,22 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* Modal */}
       {isModalOpen && (
         <Modal
           closeModal={() => setIsModalOpen(false)}
           formData={formData}
           setFormData={setFormData}
           setIsModalOpen={setIsModalOpen}
-          existingBills={fetchedReports}
           addBill={handleAddBill}
         />
       )}
       <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
         <main className="flex-1 p-8 space-y-8">
-          {/* Header */}
           <Header user={user} />
 
           <div className="grid text-black grid-cols-1 xl:grid-cols-6 lg:gap-8">
-            {/* Report Data Display Section */}
             <ReportData
               formData={formData}
               setFormData={setFormData}
@@ -413,26 +313,21 @@ export default function Dashboard() {
               onEdit={handleEditReport}
               onCancelEdit={handleCancelEdit}
             />
-            {/* Chart Section */}
             <ChartComponent chartData={chartData} />
             <Summary
-              selectedMonth={selectedMonth}
+              selectedReportCriteria={selectedReportCriteria}
               fetchedReports={fetchedReports}
-              lastReport={lastReport}
               setSummary={setSummary}
               summary={summary}
             />
           </div>
         </main>
-        {/* Reports Section */}
 
         <ReportsList
           setIsModalOpen={setIsModalOpen}
           reports={fetchedReports}
-          user={user} // fetchedReports is an array of reports from Supabase
           onReportClick={handleReportClick}
         />
-        {/**TODO fix connection */}
       </div>
     </>
   );

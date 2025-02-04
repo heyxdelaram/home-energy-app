@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa";
 const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  // Group reports by month
+  // Group reports by month for the selected year
   const groupedReports = reports
     .filter((report) => {
       const reportYear = new Date(report.date).getFullYear();
@@ -59,15 +59,18 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
         ) : (
           Object.entries(groupedReports).map(([month, reports]) => (
             <div key={month} className="mb-4">
-              <h4 className="text-md font-semibold text-gray-800 mb-2">{month}</h4>
+              <h4 className="text-md font-semibold text-gray-800 mb-2">
+                {month}
+              </h4>
               {reports.map((report, index) => (
                 <button
                   key={index}
                   className="w-full flex items-center justify-between my-2 p-4 bg-green-600 rounded-xl hover:bg-gray-200"
-                  onClick={()=>onReportClick(report.bill_type, new Date(report.date))}
+                  onClick={() =>
+                    onReportClick(report.bill_type, new Date(report.date))
+                  }
                 >
                   <span>{report.bill_type}</span>
-                  {/* <span>{new Date(report.date).toLocaleTimeString()}</span> */}
                 </button>
               ))}
             </div>
