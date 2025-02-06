@@ -39,8 +39,8 @@ export default function Dashboard() {
     labels: [],
     datasets: [
       { label: "Usage", data: [] },
-      { label: "Cost", data: [] }
-    ]
+      { label: "Cost", data: [] },
+    ],
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -132,7 +132,10 @@ export default function Dashboard() {
           .eq("user_id", userData.user.id);
 
         if (allReports.error) {
-          console.error("Error fetching all reports:", allReports.error.message);
+          console.error(
+            "Error fetching all reports:",
+            allReports.error.message
+          );
           return;
         } else {
           console.log("All Reports Data:", allReports.data);
@@ -195,7 +198,10 @@ export default function Dashboard() {
               .eq("user_id", user.id);
 
             if (allReports.error) {
-              console.error("Error fetching all reports:", allReports.error.message);
+              console.error(
+                "Error fetching all reports:",
+                allReports.error.message
+              );
             } else {
               setFetchedReports([...allReports.data]);
             }
@@ -235,23 +241,24 @@ export default function Dashboard() {
     setSelectedReportCriteria({ billType, month, year });
 
     // Update chart and form data based on related reports
-    const filteredReports = fetchedReports.filter((report) => {
-      const reportDate = new Date(report.date);
-      const reportMonth = reportDate.getMonth();
-      const reportYear = reportDate.getFullYear();
+    const filteredReports =
+      fetchedReports.filter((report) => {
+        const reportDate = new Date(report.date);
+        const reportMonth = reportDate.getMonth();
+        const reportYear = reportDate.getFullYear();
 
-      // Example: include reports for the last 3 months for this bill type
-      const isSameYear =
-        reportYear === year &&
-        reportMonth <= month &&
-        reportMonth >= month - 2;
-      const isPreviousYear =
-        reportYear === year - 1 &&
-        month < 2 &&
-        reportMonth >= 12 - (2 - month);
+        // Example: include reports for the last 3 months for this bill type
+        const isSameYear =
+          reportYear === year &&
+          reportMonth <= month &&
+          reportMonth >= month - 2;
+        const isPreviousYear =
+          reportYear === year - 1 &&
+          month < 2 &&
+          reportMonth >= 12 - (2 - month);
 
-      return report.bill_type === billType && (isSameYear || isPreviousYear);
-    }) || [];
+        return report.bill_type === billType && (isSameYear || isPreviousYear);
+      }) || [];
 
     if (filteredReports.length > 0) {
       const latestReport = filteredReports[0];
@@ -317,12 +324,12 @@ export default function Dashboard() {
               isEditing={isEditing}
               onEdit={handleEditReport}
               onCancelEdit={handleCancelEdit}
+              handleReportClick={handleReportClick}
             />
             <ChartComponent chartData={chartData} />
           </div>
           <div className="text-green-800 font-semibold">
-
-            <Summary 
+            <Summary
               selectedReportCriteria={selectedReportCriteria}
               fetchedReports={fetchedReports}
               setSummary={setSummary}

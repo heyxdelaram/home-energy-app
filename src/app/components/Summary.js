@@ -6,7 +6,7 @@ export default function Summary({
   selectedReportCriteria,
   fetchedReports,
   setSummary,
-  summary
+  summary,
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,11 +24,9 @@ export default function Summary({
         setLoading(true);
         setError("");
 
-        // Get the start date for filtering (3 months back)
-        const startDate = new Date(year, month - 2, 1); // Start from two months before
-        const endDate = new Date(year, month + 1, 0); // End of the selected month
+        const startDate = new Date(year, month - 2, 1);
+        const endDate = new Date(year, month + 1, 0);
 
-        // Filter reports matching the selected bill type and date range
         const filteredReports = fetchedReports.filter((report) => {
           const reportDate = new Date(report.date);
           return (
@@ -39,13 +37,11 @@ export default function Summary({
         });
 
         if (filteredReports.length === 0) {
-          console.warn("No reports found for the selected criteria.");
           setSummary("No reports available for the selected criteria.");
           setLoading(false);
           return;
         }
 
-        // Analyze the filtered reports
         let totalUsage = 0;
         let totalCost = 0;
 
@@ -57,27 +53,27 @@ export default function Summary({
         const averageUsage = (totalUsage / filteredReports.length).toFixed(2);
         const averageCost = (totalCost / filteredReports.length).toFixed(2);
 
-        // Generate a meaningful summary
-        let generatedSummary = `In ${month + 1}/${year}, for ${billType}:\n`;
-        generatedSummary += `Total Usage: ${totalUsage} units\n`;
-        generatedSummary += `Total Cost: $${totalCost.toFixed(2)}\n`;
-        generatedSummary += `Average Usage: ${averageUsage} units\n`;
-        generatedSummary += `Average Cost: $${averageCost}\n`;
+        let goalUsageExceededCount = filteredReports.filter(
+          (report) => report.goal_usage && report.usage > report.goal_usage
+        ).length;
 
-        // Check if goal usage was exceeded
-        let goalUsageExceededCount = filteredReports.filter(report => report.goal_usage && report.usage > report.goal_usage).length;
+        let generatedSummary = `In ${
+          month + 1
+        }/${year}, for ${billType}, the total usage was ${totalUsage} units with a total cost of $${totalCost.toFixed(
+          2
+        )}. The average usage was ${averageUsage} units and the average cost was $${averageCost}. `;
 
         if (goalUsageExceededCount > 0) {
-          generatedSummary += `Warning: The goal usage was exceeded on ${goalUsageExceededCount} occasion(s).\n`;
-          generatedSummary += `Consider reviewing your usage habits to avoid higher costs.\n`;
+          generatedSummary += `The goal usage was exceeded on ${goalUsageExceededCount} occasion(s), so consider reviewing your usage habits.`;
         } else {
-          generatedSummary += `Good job! The goal usage was not exceeded this month.\n`;
+          generatedSummary += `The goal usage was not exceeded this month, great job!`;
         }
 
         setSummary(generatedSummary);
       } catch (error) {
-        console.error("Error analyzing reports:", error);
-        setError(error.message || "Something went wrong while analyzing reports.");
+        setError(
+          error.message || "Something went wrong while analyzing reports."
+        );
       } finally {
         setLoading(false);
       }
@@ -87,10 +83,10 @@ export default function Summary({
   }, [selectedReportCriteria, fetchedReports, setSummary]);
 
   return (
-    <div className="summary-message w-full text-green-800 font-semibold ">
+    <div className="summary-message w-full text-green-800 font-semibold p-4">
       {loading && <p>Loading analysis...</p>}
-      {error && <p className="error-text">{error}</p>}
-      <pre>{summary}</pre>
+      {error && <p className="text-red-600">{error}</p>}
+      {summary && <p>{summary}</p>}
     </div>
   );
 }

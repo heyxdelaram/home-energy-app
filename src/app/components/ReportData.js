@@ -1,21 +1,30 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 
-const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
+const ReportData = ({
+  formData,
+  setFormData,
+  resetFormData,
+  onSave,
+  onUpdate,
+  lastReport,
+  handleReportClick,
+}) => {
   const [localFormData, setLocalFormData] = useState(formData);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLocalFormData(formData);
-  }, [formData]);
+    if (!isEditing) {
+      setLocalFormData({ ...formData });
+    }
+  }, [formData, isEditing]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Basic validation for cost and usage
     if (name === "cost" || name === "usage") {
       if (!value || isNaN(parseFloat(value))) {
         setError("Please enter a valid number for cost or usage.");
@@ -23,23 +32,33 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
       }
     }
 
-    setLocalFormData({ ...localFormData, [name]: value });
-    setError(null); // Clear error if valid input
+    setLocalFormData((prevData) => ({ ...prevData, [name]: value }));
+    setError(null);
   };
 
   const handleSave = async () => {
+    setSaving(true);
     setIsEditing(false);
-    onSave(localFormData); // Call the parent's handleSaveReport
-    setFormData(localFormData); // Sync changes to parent
+
+    try {
+      if (lastReport && lastReport.id) {
+        await onUpdate(localFormData, lastReport.id);
+        handleReportClick(lastReport.bill_type, new Date(lastReport.date));
+      } else {
+        await onSave(localFormData);
+      }
+      setFormData(localFormData);
+    } catch (err) {
+      console.error("Error saving report:", err);
+      setError("Failed to save report. Please try again.");
+    }
+
+    setSaving(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setLocalFormData(formData);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
   };
 
   return (
@@ -48,7 +67,7 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
         <h3 className="text-lg font-bold text-left">Report Data</h3>
         {!isEditing && (
           <button
-            onClick={handleEdit}
+            onClick={() => setIsEditing(true)}
             className="rounded-xl py-1 px-4 bg-green-600 text-white font-medium hover:bg-green-800"
           >
             Edit
@@ -58,13 +77,11 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
 
       <form className="space-y-4 flex flex-col items-center justify-between">
         <div className="space-y-4">
-          {/* Select Bill Type */}
           <div className="flex flex-row items-center">
             <label className="block w-28 text-m font-semibold text-gray-600">
               Bill Type
             </label>
             <select
-              id="utility"
               name="billType"
               className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               value={localFormData.billType}
@@ -77,7 +94,6 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
             </select>
           </div>
 
-          {/* Cost Field */}
           <div className="flex flex-row items-center">
             <label className="block w-28 text-m font-semibold text-gray-600">
               Cost
@@ -92,7 +108,6 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
             />
           </div>
 
-          {/* Usage Field */}
           <div className="flex flex-row items-center">
             <label className="block w-28 text-m font-semibold text-gray-600">
               Usage
@@ -107,14 +122,12 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
             />
           </div>
 
-          {/* Date Field */}
           <div className="flex flex-row items-center">
             <label className="block w-28 text-m font-semibold text-gray-600">
               Date
             </label>
             <input
               type="date"
-              id="date"
               name="date"
               value={localFormData.date}
               onChange={handleInputChange}
@@ -124,7 +137,6 @@ const ReportData = ({ formData, setFormData, resetFormData, onSave }) => {
           </div>
         </div>
 
-        {/* Save and Cancel Buttons */}
         {isEditing && (
           <div className="flex space-x-4 mt-4">
             <button
