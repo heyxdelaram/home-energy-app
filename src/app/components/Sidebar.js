@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaTachometerAlt,
   FaFileAlt,
   FaCog,
   FaQuestionCircle,
   FaSignOutAlt,
+  FaSun,
+  FaMoon,
 } from "react-icons/fa";
 import { supabase } from "../../../lib/supabaseClient";
 
@@ -14,7 +16,16 @@ function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false); // State for Help Modal
+  // const [darkMode, setDarkMode] = useState(false);
 
+  // useEffect(() => {
+  //   // Toggle the "dark" class on the document root element
+  //   if (darkMode) {
+  //     document.documentElement.classList.add("dark");
+  //   } else {
+  //     document.documentElement.classList.remove("dark");
+  //   }
+  // }, [darkMode]);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -44,6 +55,12 @@ function Sidebar() {
           isOpen ? "translate-x-0 h-full" : "-translate-x-full "
         } lg:translate-x-0 lg:static lg:w-48 pt-24 pb-24`}
       >
+        {/* <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
+        >
+          {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+        </button> */}
         <div className="space-y-2 ">
           <a
             href="/dashboard"

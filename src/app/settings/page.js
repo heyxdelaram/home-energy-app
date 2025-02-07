@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient"; // Adjust the path as necessary
 import Sidebar from "../components/Sidebar";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 const SettingsPage = () => {
   const [user, setUser] = useState(null);
@@ -14,7 +15,17 @@ const SettingsPage = () => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // const { darkMode, setDarkMode } = useContext(DarkModeContext);
+  const [darkMode, setDarkMode] = useState(false);
 
+  useEffect(() => {
+    // Toggle the "dark" class on the document root element
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
   useEffect(() => {
     const fetchUserData = async () => {
       const {
@@ -90,11 +101,19 @@ const SettingsPage = () => {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-white dark:bg-zinc-900">
       <Sidebar />
-      <main className="flex-1 p-8 space-y-8 text-black">
-        <h1 className="text-2xl font-bold">Settings</h1>
+      <main className="flex-1 p-8 space-y-8 pt-12 text-black">
+        <div className="flex flex-row">
+          <h1 className="text-2xl font-bold dark:text-zinc-200">Settings</h1>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="text-gray-900 mx-32 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
+          >
+            {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+          </button>
+        </div>
         <form onSubmit={handleUpdateProfile} className="mt-4 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm  text-gray-700 dark:text-zinc-400 font-semibold">
               First Name
             </label>
             <div className="relative">
@@ -102,13 +121,13 @@ const SettingsPage = () => {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 dark:bg-zinc-800 dark:border-zinc-900 focus:ring-green-500 text-green-500"
                 required
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm  dark:text-zinc-400 font-semibold text-gray-700">
               Last Name
             </label>
             <div className="relative">
@@ -116,13 +135,13 @@ const SettingsPage = () => {
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 dark:bg-zinc-800 dark:border-zinc-900 focus:ring-green-500 text-green-500"
                 required
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm  dark:text-zinc-400 font-semibold text-gray-700">
               Email
             </label>
             <div className="relative">
@@ -130,7 +149,7 @@ const SettingsPage = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 dark:bg-zinc-800 dark:border-zinc-900 focus:ring-green-500 text-green-500"
                 required
               />
             </div>
@@ -138,7 +157,7 @@ const SettingsPage = () => {
 
           {/* Password Fields */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm  dark:text-zinc-400 font-semibold text-gray-700">
               Old Password
             </label>
             <div className="relative">
@@ -146,12 +165,12 @@ const SettingsPage = () => {
                 type={showOldPassword ? "text" : "password"}
                 value={oldPassword}
                 onChange={(e) => setOldPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
-                placeholder="Enter your old password"
+                className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 dark:bg-zinc-800 dark:border-zinc-900 focus:ring-green-500 text-green-500"
+                placeholder="Enter old password"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                className="absolute inset-y-0 left-1/2 flex items-center text-gray-500"
                 onClick={() => setShowOldPassword(!showOldPassword)}
               >
                 {showOldPassword ? "🐵" : "🙈"}
@@ -160,7 +179,7 @@ const SettingsPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm  dark:text-zinc-400 font-semibold text-gray-700">
               New Password
             </label>
             <div className="relative">
@@ -168,12 +187,12 @@ const SettingsPage = () => {
                 type={showNewPassword ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
-                placeholder="Enter your new password"
+                className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 dark:bg-zinc-800 dark:border-zinc-900 focus:ring-green-500 text-green-500"
+                placeholder="Enter new password"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                className="absolute inset-y-0 left-1/2 flex items-center text-gray-500"
                 onClick={() => setShowNewPassword(!showNewPassword)}
               >
                 {showNewPassword ? "🐵" : "🙈"}
@@ -182,7 +201,7 @@ const SettingsPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm  dark:text-zinc-400 font-semibold text-gray-700">
               Confirm New Password
             </label>
             <div className="relative">
@@ -190,12 +209,12 @@ const SettingsPage = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
-                placeholder="Confirm your new password"
+                className="w-1/2 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 dark:bg-zinc-800 dark:border-zinc-900 focus:ring-green-500 text-green-500"
+                placeholder="Confirm new password"
               />
               <button
                 type="button"
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                className="absolute inset-y-0 left-1/2  flex items-center text-gray-500"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? "🐵" : "🙈"}
