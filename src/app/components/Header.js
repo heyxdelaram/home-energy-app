@@ -1,8 +1,9 @@
+// Header.jsx
 "use client";
-import { useState, useEffect } from "react";
-import { FaMoon, FaSun } from "react-icons/fa";
-import React from "react";
-import { FaCalendarAlt } from "react-icons/fa";
+import React, { useContext, useEffect, useState } from "react";
+import { FaMoon, FaSun, FaCalendarAlt } from "react-icons/fa";
+import { DarkModeContext } from "../DarkModeContext";
+
 const formatShortDate = (date) => {
   return date.toLocaleString("default", {
     month: "short",
@@ -11,28 +12,67 @@ const formatShortDate = (date) => {
   });
 };
 
-const formatDetailedDate = (date) => {
-  return date.toLocaleString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    timeZoneName: "short",
-  });
-};
-function Header({ user }) {
+function Header({ user, fetchedReports }) {
+  // const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const [darkMode, setDarkMode] = useState(false);
+
   useEffect(() => {
-    // Add or remove the "dark" class on the root element
+    // Toggle the "dark" class on the document root element
     if (darkMode) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
+
   const todayDate = new Date();
+
+  // Compute which months (from January up to the current month) are missing one or more bill types.
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1; // 1-based month number
+  let missingMonths = [];
+
+  if (fetchedReports && Array.isArray(fetchedReports)) {
+    // For each month from January (1) up to the current month:
+    for (let m = 1; m <= currentMonth; m++) {
+      // Filter bills for the current year and for month m.
+      const billsForMonth = fetchedReports.filter((report) => {
+        const reportDate = new Date(report.date);
+        return (
+          reportDate.getFullYear() === currentYear &&
+          reportDate.getMonth() + 1 === m
+        );
+      });
+      // Get unique bill types in that month.
+      const uniqueTypes = new Set(
+        billsForMonth.map((report) => report.bill_type)
+      );
+      // If fewer than 3 bill types are found, mark the month as incomplete.
+      if (uniqueTypes.size < 3) {
+        missingMonths.push(m);
+      }
+    }
+  }
+
+  const missingCount = missingMonths.length;
+  const missingMonthNames = missingMonths
+    .map((m) => monthNames[m - 1])
+    .join(", ");
+
   return (
     <header className="pt-4">
       <div className="flex justify-between items-center">
@@ -52,7 +92,7 @@ function Header({ user }) {
         </div>
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800  dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
+          className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
         >
           {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
         </button>
@@ -61,9 +101,15 @@ function Header({ user }) {
           <span>{formatShortDate(todayDate)}</span>
         </div>
       </div>
-      <div className="bg-gray-100 dark:bg-zinc-800 text-sm font-semibold text-gray-500 dark:text-zinc-200 p-2 rounded-full mt-4">
-        <p>⚠️ You have 3 unassigned monthly reports.</p>
-      </div>
+      {missingCount > 0 && (
+        <div className="bg-gray-100 dark:bg-zinc-800 text-sm font-semibold text-gray-500 dark:text-zinc-200 p-2 rounded-full mt-4">
+          <p>
+            ⚠️ There {missingCount === 1 ? "is" : "are"} {missingCount} month
+            {missingCount === 1 ? "" : "s"} with incomplete bills:{" "}
+            {missingMonthNames}.
+          </p>
+        </div>
+      )}
     </header>
   );
 }

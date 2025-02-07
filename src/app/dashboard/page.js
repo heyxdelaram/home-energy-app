@@ -323,7 +323,7 @@ export default function Dashboard() {
       <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white dark:bg-zinc-900">
         <Sidebar />
         <main className="flex-1 p-8 space-y-8">
-          <Header user={user} />
+          <Header user={user} fetchedReports={fetchedReports} />
           <div className="grid text-black dark:text-gray-100 grid-cols-1 xl:grid-cols-6 lg:gap-8">
             <ReportData
               formData={formData}
