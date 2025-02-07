@@ -52,13 +52,14 @@ function Sidebar() {
             <FaTachometerAlt color="green" /> {/* Dashboard Icon */}
             <span>Dashboard</span>
           </a>
-          <a
+          {/* <a
             href="#"
             className="flex items-center space-x-2 block text-m hover:text-green-800"
           >
-            <FaFileAlt color="green" /> {/* Reports Icon */}
+            <FaFileAlt color="green" />
             <span>Reports</span>
-          </a>
+          </a> 
+          */}
           <a
             href="#"
             className="flex items-center space-x-2 block text-m hover:text-green-800"
@@ -97,18 +98,18 @@ function Sidebar() {
 
           {/* Modal Content */}
           <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white p-5 rounded-xl text-black">
+            <div className="bg-white dark:bg-zinc-900 font-semibold text-zinc-900 dark:text-zinc-200  p-5 rounded-xl">
               <h2 className="text-lg font-semibold">Confirm Logout</h2>
               <p>Are you sure you want to log out?</p>
               <div className="mt-4 flex justify-end">
                 <button
-                  className="mr-2 px-4 py-2 bg-gray-300 rounded"
+                  className="mr-2 px-4 py-2 bg-gray-300 dark:bg-zinc-800 rounded-xl"
                   onClick={() => setShowLogoutModal(false)} // Close modal
                 >
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 bg-red-600 text-white rounded"
+                  className="px-4 py-2 bg-red-600 text-white rounded-xl"
                   onClick={() => {
                     handleLogout(); // Call logout function
                     setShowLogoutModal(false); // Close modal after logout
@@ -130,7 +131,7 @@ function Sidebar() {
 
           {/* Help Modal Content */}
           <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white p-5 rounded-xl text-black max-w-md w-full">
+            <div className="bg-white  dark:bg-zinc-900 p-5 rounded-xl text-black dark:text-zinc-200 max-w-md w-full">
               <h2 className="text-lg font-semibold">Help Information</h2>
               <p>This application helps you manage your tasks efficiently.</p>
               <p>Here are some features:</p>
@@ -142,7 +143,7 @@ function Sidebar() {
               {/* Add more help content here as needed */}
               <div className="mt-4 flex justify-end">
                 <button
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-4 py-2 bg-gray-300 dark:bg-zinc-800 rounded-xl"
                   onClick={() => setShowHelpModal(false)} // Close modal
                 >
                   Close
