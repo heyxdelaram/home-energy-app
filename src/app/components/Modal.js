@@ -70,16 +70,16 @@ function Modal({
       onClick={closeModal}
     >
       <div
-        className="bg-white rounded-3xl p-8 lg:w-[600px]"
+        className="bg-white dark:bg-zinc-900 rounded-3xl p-8 lg:w-[600px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl text-black font-bold mb-8 mt-8 text-center">
+        <h2 className="text-xl text-black dark:text-zinc-200 font-bold mb-8 mt-8 text-center">
           Add New Bill
         </h2>
         <form className="space-y-4 flex flex-col items-center lg:mx-32">
           <div className="space-y-4">
             <div className="flex flex-row items-center">
-              <label className="block w-28 text-m font-semibold text-gray-600">
+              <label className="block w-28 text-m font-semibold text-gray-600 dark:text-zinc-400">
                 Date
               </label>
               <input
@@ -87,14 +87,14 @@ function Modal({
                 name="date"
                 value={formData.date}
                 onChange={(e) => handleDateChange(e.target.value)}
-                className="w-48 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+                className="w-48 p-3 border border-gray-300 dark:border-zinc-900 dark:bg-zinc-800 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               />
             </div>
 
             {isDateSelected && (
               <>
                 <div className="flex flex-row items-center">
-                  <label className="block w-28 text-m font-semibold text-gray-600">
+                  <label className="block w-28 text-m font-semibold dark:text-zinc-400 text-gray-600">
                     Bill Type
                   </label>
                   <select
@@ -102,7 +102,7 @@ function Modal({
                     name="billType"
                     value={formData.billType || ""}
                     onChange={handleInputChange}
-                    className="w-48 p-3 border border-gray-300 bg-black text-white rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+                    className="w-48 p-3 border border-gray-300 dark:border-zinc-900  bg-black text-white rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
                   >
                     <option value="" disabled>
                       Select Bill Type
@@ -126,7 +126,7 @@ function Modal({
                 </div>
 
                 <div className="flex flex-row items-center">
-                  <label className="block w-28 text-m font-semibold text-gray-600">
+                  <label className="block w-28 text-m font-semibold dark:text-zinc-400  text-gray-600">
                     Cost
                   </label>
                   <input
@@ -134,12 +134,12 @@ function Modal({
                     name="cost"
                     value={formData.cost}
                     onChange={handleInputChange}
-                    className="w-48 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+                    className="w-48 p-3 border border-gray-300 dark:border-zinc-900 dark:bg-zinc-800 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
                   />
                 </div>
 
                 <div className="flex flex-row items-center">
-                  <label className="block w-28 text-m font-semibold text-gray-600">
+                  <label className="block w-28 text-m font-semibold dark:text-zinc-400 text-gray-600">
                     Usage
                   </label>
                   <input
@@ -147,7 +147,7 @@ function Modal({
                     name="usage"
                     value={formData.usage}
                     onChange={handleInputChange}
-                    className="w-48 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+                    className="w-48 p-3 border border-gray-300 dark:border-zinc-900 dark:bg-zinc-800 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
                     placeholder="Enter usage"
                   />
                 </div>
@@ -159,14 +159,14 @@ function Modal({
         <div className="mt-6 flex justify-end space-x-4">
           <button
             onClick={() => setIsModalOpen(false)}
-            className="px-4 py-2 font-semibold rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300"
+            className="px-4 py-2 font-semibold rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300 dark:border-zinc-900 dark:bg-zinc-700 dark:text-zinc-300"
           >
             Cancel
           </button>
           {isDateSelected && (
             <button
               onClick={handleSave}
-              className="px-4 py-2 font-semibold rounded-xl bg-green-500 text-white hover:bg-green-600"
+              className="px-4 py-2 font-semibold rounded-xl bg-green-700 dark:border-zinc-900 text-white hover:bg-green-600"
             >
               Save
             </button>

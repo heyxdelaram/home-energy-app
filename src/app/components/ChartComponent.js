@@ -28,7 +28,7 @@ function ChartComponent({ chartData }) {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4">
+    <div className="bg-white rounded-xl p-6 col-span-4 lg:col-span-4 lg:dark:bg-zinc-800 dark:bg-zinc-900">
       <h2>Report</h2>
       <Line data={chartData} />
     </div>

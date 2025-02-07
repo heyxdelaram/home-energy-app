@@ -7,8 +7,8 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily:{
-        sans: ['Poppins', 'Cambria', 'Cochin', 'Georgia', 'Times', 'serif'],
+      fontFamily: {
+        sans: ["Poppins", "Cambria", "Cochin", "Georgia", "Times", "serif"],
       },
       colors: {
         background: "var(--background)",
@@ -16,6 +16,6 @@ export default {
       },
     },
   },
-  darkMode: "media", // Ensure this is valid (either 'media' or 'class')
+  darkMode: "class", // Ensure this is valid (either 'media' or 'class')
   plugins: [],
 };

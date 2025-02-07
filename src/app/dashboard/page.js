@@ -320,11 +320,11 @@ export default function Dashboard() {
           existingBills={fetchedReports}
         />
       )}
-      <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white">
+      <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white dark:bg-zinc-900">
         <Sidebar />
         <main className="flex-1 p-8 space-y-8">
           <Header user={user} />
-          <div className="grid text-black grid-cols-1 xl:grid-cols-6 lg:gap-8">
+          <div className="grid text-black dark:text-gray-100 grid-cols-1 xl:grid-cols-6 lg:gap-8">
             <ReportData
               formData={formData}
               setFormData={setFormData}
@@ -337,13 +337,12 @@ export default function Dashboard() {
             />
             <ChartComponent chartData={chartData} />
           </div>
-          <div className="text-green-800 font-semibold">
+          <div className="text-green-800  font-semibold">
             <Summary
               selectedReportCriteria={selectedReportCriteria}
               fetchedReports={fetchedReports}
               setSummary={setSummary}
               summary={summary}
-              chartData={chartData}
             />
           </div>
         </main>

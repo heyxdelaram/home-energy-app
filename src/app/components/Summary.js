@@ -84,7 +84,7 @@ export default function Summary({
   }, [selectedReportCriteria, fetchedReports, setSummary]);
 
   return (
-    <div className="summary-message w-full text-green-800 font-semibold p-4">
+    <div className="summary-message w-full text-green-800 dark:text-green-600 font-semibold p-4">
       {loading && <p>Loading analysis...</p>}
       {error && <p className="text-red-600">{error}</p>}
       {summary && <p>{summary}</p>}

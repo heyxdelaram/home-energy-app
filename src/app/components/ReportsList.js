@@ -19,12 +19,12 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
     }, {});
 
   return (
-    <div className="bg-gray-100 text-black rounded-xl lg:m-4 p-6 lg:w-1/6 m-8 flex flex-col ">
+    <div className="bg-gray-100 text-black dark:bg-zinc-800 dark:text-zinc-200 rounded-xl lg:m-4 p-6 lg:w-1/6 m-8 flex flex-col ">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-bold">Reports</h3>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="text-green-500 hover:bg-green-100 p-2 rounded-xl"
+          className="text-green-500 hover:bg-green-100 hover:dark:bg-green-800 p-2 rounded-xl"
         >
           <FaPlus size={18} />
         </button>
@@ -33,7 +33,7 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
       <div className="flex flex-col items-center">
         <label
           htmlFor="year"
-          className="block w-full text-sm font-semibold text-gray-600 mb-2"
+          className="block w-full text-sm font-semibold dark:text-zinc-300 text-gray-600 mb-2"
         >
           Select Year
         </label>
@@ -42,7 +42,7 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
           name="year"
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
-          className="w-full mb-4 p-4 border border-gray-300 bg-black rounded-xl focus:outline-none text-white text-sm focus:ring-2 focus:ring-green-500"
+          className="w-full mb-4 p-4 border border-gray-300 dark:border-zinc-800 bg-black rounded-xl focus:outline-none text-white text-sm focus:ring-2 focus:ring-green-500"
         >
           <option value="2023">2023</option>
           <option value="2024">2024</option>
@@ -56,13 +56,13 @@ const ReportsList = ({ setIsModalOpen, reports, onReportClick }) => {
         ) : (
           Object.entries(groupedReports).map(([month, reports]) => (
             <div key={month} className="mb-4">
-              <h4 className="text-md font-semibold text-gray-800 mb-2">
+              <h4 className="text-md font-semibold text-gray-800 dark:text-zinc-400 mb-2">
                 {month}
               </h4>
               {reports.map((report, index) => (
                 <button
                   key={index}
-                  className="w-full flex items-center justify-between my-2 p-4 bg-green-600 rounded-xl hover:bg-gray-200"
+                  className="w-full flex items-center justify-between my-2 p-4 bg-green-600 rounded-xl  hover:bg-green-800"
                   onClick={() =>
                     onReportClick(report.bill_type, new Date(report.date))
                   }

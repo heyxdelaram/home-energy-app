@@ -27,7 +27,7 @@ function Sidebar() {
   return (
     <>
       {!isOpen && (
-        <nav className="bg-white w-full lg:hidden left-4 p-2 font-extrabold text-gray-800 fixed z-40">
+        <nav className="bg-white dark:bg-zinc-900 w-full lg:hidden left-4 p-2 font-extrabold dark:text-zinc-200 text-gray-800 fixed z-40">
           <button onClick={() => setIsOpen(true)}>☰</button>
         </nav>
       )}
@@ -40,7 +40,7 @@ function Sidebar() {
       )}
       {/* Sidebar Menu */}
       <div
-        className={`fixed top-0 left-0 w-fixed bg-gray-100 font-semibold text-zinc-900 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
+        className={`fixed top-0 left-0 w-fixed bg-gray-100 dark:bg-zinc-800 font-semibold text-zinc-900 dark:text-zinc-200 p-6 flex flex-col justify-between z-40 transform transition-transform rounded-xl m-4 ${
           isOpen ? "translate-x-0 h-full" : "-translate-x-full "
         } lg:translate-x-0 lg:static lg:w-48 pt-24 pb-24`}
       >

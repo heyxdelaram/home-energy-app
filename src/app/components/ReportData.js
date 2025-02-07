@@ -62,7 +62,7 @@ const ReportData = ({
   };
 
   return (
-    <div className="bg-gray-100 rounded-xl p-6 col-span-2">
+    <div className="bg-gray-100 dark:bg-zinc-800 rounded-xl p-6 col-span-2">
       <div className="flex flex-row items-center justify-between mb-8">
         <h3 className="text-lg font-bold text-left">Report Data</h3>
         {!isEditing && (
@@ -78,12 +78,12 @@ const ReportData = ({
       <form className="space-y-4 flex flex-col items-center justify-between">
         <div className="space-y-4">
           <div className="flex flex-row items-center">
-            <label className="block w-28 text-m font-semibold text-gray-600">
+            <label className="block w-28 text-m font-semibold text-gray-600 dark:text-zinc-400">
               Bill Type
             </label>
             <select
               name="billType"
-              className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+              className="w-32 p-3 border border-gray-300 dark:border-zinc-800 dark:bg-zinc-600  rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               value={localFormData.billType}
               onChange={handleInputChange}
               disabled={!isEditing}
@@ -95,7 +95,7 @@ const ReportData = ({
           </div>
 
           <div className="flex flex-row items-center">
-            <label className="block w-28 text-m font-semibold text-gray-600">
+            <label className="block w-28 text-m font-semibold text-gray-600 dark:text-zinc-400">
               Cost
             </label>
             <input
@@ -103,13 +103,13 @@ const ReportData = ({
               name="cost"
               value={localFormData.cost}
               onChange={handleInputChange}
-              className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+              className="w-32 p-3 border border-gray-300 dark:border-zinc-800 dark:bg-zinc-600 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               disabled={!isEditing}
             />
           </div>
 
           <div className="flex flex-row items-center">
-            <label className="block w-28 text-m font-semibold text-gray-600">
+            <label className="block w-28 text-m font-semibold text-gray-600 dark:text-zinc-400">
               Usage
             </label>
             <input
@@ -117,13 +117,13 @@ const ReportData = ({
               name="usage"
               value={localFormData.usage}
               onChange={handleInputChange}
-              className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+              className="w-32 p-3 border border-gray-300 dark:border-zinc-800 dark:bg-zinc-600 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               disabled={!isEditing}
             />
           </div>
 
           <div className="flex flex-row items-center">
-            <label className="block w-28 text-m font-semibold text-gray-600">
+            <label className="block w-28 text-m font-semibold text-gray-600 dark:text-zinc-400">
               Date
             </label>
             <input
@@ -131,7 +131,7 @@ const ReportData = ({
               name="date"
               value={localFormData.date}
               onChange={handleInputChange}
-              className="w-32 p-3 border border-gray-300 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
+              className="w-32 p-3 border border-gray-300 dark:border-zinc-800 dark:bg-zinc-600 rounded-xl focus:outline-none text-sm focus:ring-2 focus:ring-green-500"
               disabled={!isEditing}
             />
           </div>

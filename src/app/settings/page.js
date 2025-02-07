@@ -88,7 +88,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-white">
+    <div className="flex flex-col lg:flex-row h-screen bg-white dark:bg-zinc-900">
       <Sidebar />
       <main className="flex-1 p-8 space-y-8 text-black">
         <h1 className="text-2xl font-bold">Settings</h1>
