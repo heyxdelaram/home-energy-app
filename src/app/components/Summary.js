@@ -44,6 +44,7 @@ export default function Summary({
 
         let totalUsage = 0;
         let totalCost = 0;
+        console.log(filteredReports);
 
         filteredReports.forEach((report) => {
           totalUsage += report.usage || 0;
@@ -57,7 +58,7 @@ export default function Summary({
           (report) => report.goal_usage && report.usage > report.goal_usage
         ).length;
 
-        let generatedSummary = `In ${
+        let generatedSummary = `In the past three months including ${
           month + 1
         }/${year}, for ${billType}, the total usage was ${totalUsage} units with a total cost of $${totalCost.toFixed(
           2

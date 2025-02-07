@@ -69,21 +69,26 @@ export default function Dashboard() {
         return;
       }
 
-      const { error } = await supabase.from("bills").insert({
-        bill_type: formData.billType,
-        cost: parseFloat(formData.cost),
-        usage: parseFloat(formData.usage),
-        date: formData.date,
-        user_id: user.id,
-      });
+      const { data, error } = await supabase
+        .from("bills")
+        .insert({
+          bill_type: formData.billType,
+          cost: parseFloat(formData.cost),
+          usage: parseFloat(formData.usage),
+          date: formData.date,
+          user_id: user.id,
+        })
+        .select();
 
       if (error) {
         console.error("Error saving bill:", error.message);
         alert("Failed to save the bill.");
-      } else {
+      } else if (data && data.length > 0) {
         alert("Bill added successfully!");
+        setFetchedReports((prevReports) => [data[0], ...prevReports]);
+        setLastReport(data[0]);
         setIsModalOpen(false);
-        setFormData({ billType: "", cost: "", usage: "", date: "" });
+        setFormData({ billType: "", cost: "", usage: "", date: "" }); // Reset form data
       }
     } catch (error) {
       console.error("Error:", error.message);
@@ -128,7 +133,7 @@ export default function Dashboard() {
 
         const allReports = await supabase
           .from("bills")
-          .select("date, usage, cost, goal_usage, bill_type")
+          .select("id, date, usage, cost, goal_usage, bill_type")
           .eq("user_id", userData.user.id);
 
         if (allReports.error) {
@@ -194,7 +199,7 @@ export default function Dashboard() {
 
             const allReports = await supabase
               .from("bills")
-              .select("date, usage, cost, goal_usage, bill_type")
+              .select("id, date, usage, cost, goal_usage, bill_type")
               .eq("user_id", user.id);
 
             if (allReports.error) {
@@ -233,14 +238,13 @@ export default function Dashboard() {
     });
   };
 
-  // When a report is clicked, set the criteria (bill type, month, year)
+  // --- UPDATED: Sort the filtered reports in ascending order ---
   const handleReportClick = (billType, selectedDate) => {
     const month = selectedDate.getMonth(); // zero-indexed
     const year = selectedDate.getFullYear();
 
     setSelectedReportCriteria({ billType, month, year });
 
-    // Update chart and form data based on related reports
     const filteredReports =
       fetchedReports.filter((report) => {
         const reportDate = new Date(report.date);
@@ -260,8 +264,14 @@ export default function Dashboard() {
         return report.bill_type === billType && (isSameYear || isPreviousYear);
       }) || [];
 
-    if (filteredReports.length > 0) {
-      const latestReport = filteredReports[0];
+    // Sort the filtered reports in ascending order (oldest first)
+    const sortedReports = filteredReports.sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+
+    if (sortedReports.length > 0) {
+      // Grab the most recent report (last element) for updating the form
+      const latestReport = sortedReports[sortedReports.length - 1];
       setFormData({
         cost: latestReport.cost.toString(),
         usage: latestReport.usage.toString(),
@@ -270,14 +280,14 @@ export default function Dashboard() {
       });
     }
 
-    const labels = filteredReports.map((report) =>
+    const labels = sortedReports.map((report) =>
       new Date(report.date).toLocaleString("default", {
         month: "short",
         year: "numeric",
       })
     );
-    const usageData = filteredReports.map((report) => report.usage || 0);
-    const costData = filteredReports.map((report) => report.cost || 0);
+    const usageData = sortedReports.map((report) => report.usage || 0);
+    const costData = sortedReports.map((report) => report.cost || 0);
 
     setChartData({
       labels,
@@ -307,14 +317,13 @@ export default function Dashboard() {
           setFormData={setFormData}
           setIsModalOpen={setIsModalOpen}
           addBill={handleAddBill}
+          existingBills={fetchedReports}
         />
       )}
       <div className="flex flex-col lg:flex-row h-full lg:h-screen bg-white">
         <Sidebar />
-
         <main className="flex-1 p-8 space-y-8">
           <Header user={user} />
-
           <div className="grid text-black grid-cols-1 xl:grid-cols-6 lg:gap-8">
             <ReportData
               formData={formData}
@@ -338,7 +347,6 @@ export default function Dashboard() {
             />
           </div>
         </main>
-
         <ReportsList
           setIsModalOpen={setIsModalOpen}
           reports={fetchedReports}

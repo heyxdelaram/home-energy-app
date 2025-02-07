@@ -18,7 +18,6 @@ function Modal({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Extracted date filtering logic to a separate function
   const updateDisabledBillTypes = (date) => {
     if (!existingBills || !Array.isArray(existingBills)) {
       console.warn("existingBills is undefined or not an array");
@@ -27,10 +26,9 @@ function Modal({
 
     const selectedDate = new Date(date);
     const existingForDate = existingBills.filter((bill) => {
-      if (!bill.date) return false; // Skip bills without a date
+      if (!bill.date) return false;
 
       const billDate = new Date(bill.date);
-
       return (
         billDate.getFullYear() === selectedDate.getFullYear() &&
         billDate.getMonth() === selectedDate.getMonth()
@@ -38,26 +36,33 @@ function Modal({
     });
 
     const types = existingForDate.map((bill) => bill.bill_type);
-    console.log("Disabled Bill Types:", types); // Debugging log
     setDisabledBillTypes(types);
   };
 
   const handleDateChange = (date) => {
     setFormData((prev) => ({ ...prev, date }));
     setIsDateSelected(true);
-    updateDisabledBillTypes(date); // Call the update function here
+    updateDisabledBillTypes(date);
   };
 
-  // Use useEffect to update disabledBillTypes whenever formData.date changes AFTER it's initially set
   useEffect(() => {
     if (formData.date) {
-      setIsDateSelected(true); // Ensure fields are enabled
-      updateDisabledBillTypes(formData.date); // Re-run the logic
+      setIsDateSelected(true);
+      updateDisabledBillTypes(formData.date);
     } else {
-      setIsDateSelected(false); // Disable fields if no date
-      setDisabledBillTypes([]); // Clear disabled types
+      setIsDateSelected(false);
+      setDisabledBillTypes([]);
     }
-  }, [formData.date, existingBills]); // Important: Add existingBills as a dependency
+  }, [formData.date, existingBills]);
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    if (disabledBillTypes.includes(formData.billType)) {
+      alert("This bill type already exists for the selected month.");
+      return;
+    }
+    addBill();
+  };
 
   return (
     <div
@@ -73,7 +78,6 @@ function Modal({
         </h2>
         <form className="space-y-4 flex flex-col items-center lg:mx-32">
           <div className="space-y-4">
-            {/* Date Field */}
             <div className="flex flex-row items-center">
               <label className="block w-28 text-m font-semibold text-gray-600">
                 Date
@@ -89,7 +93,6 @@ function Modal({
 
             {isDateSelected && (
               <>
-                {/* Bill Type Field */}
                 <div className="flex flex-row items-center">
                   <label className="block w-28 text-m font-semibold text-gray-600">
                     Bill Type
@@ -122,7 +125,6 @@ function Modal({
                   </select>
                 </div>
 
-                {/* Cost Field */}
                 <div className="flex flex-row items-center">
                   <label className="block w-28 text-m font-semibold text-gray-600">
                     Cost
@@ -136,7 +138,6 @@ function Modal({
                   />
                 </div>
 
-                {/* Usage Field */}
                 <div className="flex flex-row items-center">
                   <label className="block w-28 text-m font-semibold text-gray-600">
                     Usage
@@ -164,10 +165,7 @@ function Modal({
           </button>
           {isDateSelected && (
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                addBill();
-              }}
+              onClick={handleSave}
               className="px-4 py-2 font-semibold rounded-xl bg-green-500 text-white hover:bg-green-600"
             >
               Save
