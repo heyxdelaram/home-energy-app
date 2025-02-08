@@ -5,22 +5,57 @@ import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { FaMoon, FaSun } from "react-icons/fa";
 
+/**
+ * LoginPage Component
+ *
+ * Renders the login page which allows users to sign in using their email and password.
+ * It includes functionality for toggling dark mode, showing/hiding the password,
+ * and basic error handling during authentication.
+ *
+ * @component
+ * @example
+ * return (
+ *   <LoginPage />
+ * )
+ *
+ * @returns {JSX.Element} The rendered login page component.
+ */
 export default function LoginPage() {
+  // State to store the email input.
   const [email, setEmail] = useState("");
+  // State to store the password input.
   const [password, setPassword] = useState("");
+  // State to toggle the visibility of the password.
   const [showPassword, setShowPassword] = useState(false);
+  // State to store any error messages during login.
   const [error, setError] = useState(null);
+  // Next.js router for navigation.
   const router = useRouter();
+  // State to toggle dark mode.
   const [darkMode, setDarkMode] = useState(false);
-    useEffect(() => {
-      // Toggle the "dark" class on the document root element
-      if (darkMode) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }, [darkMode]);
 
+  /**
+   * useEffect hook to toggle dark mode.
+   *
+   * When the darkMode state changes, this effect adds or removes the "dark" class
+   * on the document root element (<html>), enabling or disabling dark mode styling.
+   */
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
+
+  /**
+   * Handle form submission for logging in.
+   *
+   * Authenticates the user using Supabase's `signInWithPassword` method. If the authentication
+   * fails, an error message is displayed; otherwise, the user is redirected to the dashboard.
+   *
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
@@ -44,24 +79,24 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-zinc-900">
-      {/* Right Section */}
-      <div className="flex flex-1 flex-col  items-center justify-center px-8 bg-white dark:bg-zinc-900">
-      <div className="flex justify-between w-full items-center">
-  <button
-    className="self-start font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-800 ml-0.5 mb-16"
-    onClick={() => router.back()}
-  >
-    ← Go Back
-  </button>
-
-  <button
-    onClick={() => setDarkMode(!darkMode)}
-    className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
-  >
-    {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-  </button>
-</div>
-
+      {/* Right Section: Contains the login form and related UI elements */}
+      <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white dark:bg-zinc-900">
+        <div className="flex justify-between w-full items-center">
+          {/* Back button: Navigates to the previous page */}
+          <button
+            className="self-start font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-800 ml-0.5 mb-16"
+            onClick={() => router.back()}
+          >
+            ← Go Back
+          </button>
+          {/* Dark mode toggle button */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
+          >
+            {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+          </button>
+        </div>
 
         <div className="w-full max-w-md">
           <h1 className="text-2xl font-bold text-gray-800 mb-2 dark:text-zinc-200">
@@ -89,6 +124,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              {/* Button to toggle password visibility */}
               <button
                 type="button"
                 className="absolute inset-y-0 right-3 flex items-center text-gray-500"
@@ -97,13 +133,16 @@ export default function LoginPage() {
                 {showPassword ? "🐵" : "🙈"}
               </button>
             </div>
-            {/* Remember Me and Forgot Password */}
+            {/* Remember Me and Forgot Password Section */}
             <div className="flex items-center justify-between text-sm text-gray-500">
               {/**
                * TODO: implement remember me functionality
                */}
               <label className="flex items-center dark:text-zinc-300">
-                <input type="checkbox" className="mr-2 dark:border-zinc-900 dark:bg-zinc-800" />
+                <input
+                  type="checkbox"
+                  className="mr-2 dark:border-zinc-900 dark:bg-zinc-800"
+                />
                 Remember me
               </label>
               {/**
@@ -129,7 +168,7 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-      {/* Left Section */}
+      {/* Left Section: Displayed on medium (md) and larger screens */}
       <div className="hidden md:flex flex-1 items-center justify-center bg-white">
         <div className="w-3/4 h-5/6 bg-gray-300 rounded-xl"></div>
       </div>
