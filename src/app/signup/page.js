@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,15 @@ export default function SignUpPage() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const router = useRouter();
-
+  const [darkMode, setDarkMode] = useState(false);
+    useEffect(() => {
+      // Toggle the "dark" class on the document root element
+      if (darkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }, [darkMode]);
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError(null);
@@ -56,21 +65,30 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-zinc-900">
       {/* Left Section */}
-      <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white">
-        <button
-          className="self-start font-bold text-gray-600 hover:text-gray-800 ml-0.5 mb-16"
-          onClick={() => router.back()}
-        >
-          ← Go Back
-        </button>
+      <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white dark:bg-zinc-900">
+              <div className="flex justify-between w-full items-center">
+          <button
+            className="self-start font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-800 ml-0.5 mb-16"
+            onClick={() => router.back()}
+          >
+            ← Go Back
+          </button>
+        
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
+          >
+            {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+          </button>
+        </div>
 
         <div className="w-full max-w-md">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2 dark:text-zinc-200">
             Create An Account!
           </h1>
-          <p className="text-gray-500">Sign Up</p>
+          <p className="text-gray-500 dark:text-zinc-300">Sign Up</p>
           <form onSubmit={handleSignUp} className="space-y-4 mt-10">
             {error && <p className="text-red-500 text-sm mb-4">* {error}</p>}
             {successMessage && (
@@ -80,7 +98,7 @@ export default function SignUpPage() {
             <div className="flex flex-1">
               <div className="mr-4">
                 <input
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500 dark:border-zinc-900 dark:bg-zinc-800"
                   type="text"
                   placeholder="First Name"
                   value={firstName}
@@ -89,7 +107,7 @@ export default function SignUpPage() {
               </div>
               <div>
                 <input
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500 dark:border-zinc-900 dark:bg-zinc-800"
                   type="text"
                   placeholder="Last Name"
                   value={lastName}
@@ -100,7 +118,7 @@ export default function SignUpPage() {
             {/* Email Field */}
             <div>
               <input
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500 dark:border-zinc-900 dark:bg-zinc-800"
                 type="email"
                 placeholder="Email"
                 value={email}
@@ -110,7 +128,7 @@ export default function SignUpPage() {
             {/* Password Fields */}
             <div className="relative">
               <input
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500 dark:border-zinc-900 dark:bg-zinc-800"
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
@@ -126,7 +144,7 @@ export default function SignUpPage() {
             </div>
             <div className="relative">
               <input
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500 dark:border-zinc-900 dark:bg-zinc-800"
                 type={showPassword ? "text" : "password"}
                 placeholder="Confirm Password"
                 value={confirmPassword}
@@ -158,7 +176,7 @@ export default function SignUpPage() {
               Sign Up
             </button>
           </form>
-          <p className="text-sm mt-16 text-center text-gray-500">
+          <p className="text-sm mt-16 text-center text-gray-500 dark:text-zinc-300">
             Already have an account?{" "}
             <a href="/login" className="text-green-500 hover:underline">
               Log in

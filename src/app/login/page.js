@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { FaMoon, FaSun } from "react-icons/fa";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -10,6 +11,15 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
+  const [darkMode, setDarkMode] = useState(false);
+    useEffect(() => {
+      // Toggle the "dark" class on the document root element
+      if (darkMode) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }, [darkMode]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -33,27 +43,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 dark:bg-zinc-900">
       {/* Right Section */}
-      <div className="flex flex-1 flex-col  items-center justify-center px-8 bg-white">
-        <button
-          className="self-start font-bold text-gray-600 hover:text-gray-800 ml-0.5 mb-16"
-          onClick={() => router.back()}
-        >
-          ← Go Back
-        </button>
+      <div className="flex flex-1 flex-col  items-center justify-center px-8 bg-white dark:bg-zinc-900">
+      <div className="flex justify-between w-full items-center">
+  <button
+    className="self-start font-bold text-gray-600 dark:text-zinc-400 hover:text-gray-800 ml-0.5 mb-16"
+    onClick={() => router.back()}
+  >
+    ← Go Back
+  </button>
+
+  <button
+    onClick={() => setDarkMode(!darkMode)}
+    className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
+  >
+    {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+  </button>
+</div>
+
 
         <div className="w-full max-w-md">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2 dark:text-zinc-200">
             Welcome Back!
           </h1>
-          <p className="text-gray-500">Log in to your Account</p>
+          <p className="text-gray-500 dark:text-zinc-300">Log in to your Account</p>
           {error && <p className="text-red-500 text-sm mb-4">* {error}</p>}
           <form onSubmit={handleLogin} className="space-y-4 mt-10">
             {/* Email Field */}
             <div>
               <input
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-full px-4 py-2 border dark:border-zinc-900 dark:bg-zinc-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
                 type="email"
                 placeholder="Email"
                 value={email}
@@ -63,7 +83,7 @@ export default function LoginPage() {
             {/* Password Field */}
             <div className="relative">
               <input
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
+                className="w-full px-4 py-2 border rounded-lg dark:border-zinc-900 dark:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
@@ -82,8 +102,8 @@ export default function LoginPage() {
               {/**
                * TODO: implement remember me functionality
                */}
-              <label className="flex items-center">
-                <input type="checkbox" className="mr-2" />
+              <label className="flex items-center dark:text-zinc-300">
+                <input type="checkbox" className="mr-2 dark:border-zinc-900 dark:bg-zinc-800" />
                 Remember me
               </label>
               {/**
@@ -101,7 +121,7 @@ export default function LoginPage() {
               Log in
             </button>
           </form>
-          <p className="text-sm mt-16 text-center text-gray-500">
+          <p className="text-sm mt-16 text-center text-gray-500 dark:text-zinc-300">
             Don’t have an account?{" "}
             <a href="/signup" className="text-green-500 hover:underline">
               Create an account
