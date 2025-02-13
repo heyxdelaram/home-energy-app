@@ -1,18 +1,13 @@
 "use client";
 
-<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import CryptoJS from "crypto-js";
 
 const SECRET_KEY = "your-secret-key"; // Replace with an actual secret key
-=======
-import { useEffect, useState } from "react";
-import { supabase } from "../../../lib/supabaseClient";
-import { useRouter } from "next/navigation";
+
 import { FaMoon, FaSun } from "react-icons/fa";
->>>>>>> e1e6e9612074734aa6233e7a007fe977cd624554
 
 /**
  * LoginPage Component
@@ -38,16 +33,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   // State to store any error messages during login.
   const [error, setError] = useState(null);
-<<<<<<< HEAD
   const [rememberMe, setRememberMe] = useState(false);
-=======
-  // Next.js router for navigation.
->>>>>>> e1e6e9612074734aa6233e7a007fe977cd624554
   const router = useRouter();
   // State to toggle dark mode.
   const [darkMode, setDarkMode] = useState(false);
-
-<<<<<<< HEAD
+  useEffect(() => {
+    // Toggle the "dark" class on the document root element
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
   // Load stored credentials from localStorage
   useEffect(() => {
     const storedEmail = localStorage.getItem("rememberedEmail");
@@ -66,30 +63,6 @@ export default function LoginPage() {
     }
   }, []);
 
-=======
-  /**
-   * useEffect hook to toggle dark mode.
-   *
-   * When the darkMode state changes, this effect adds or removes the "dark" class
-   * on the document root element (<html>), enabling or disabling dark mode styling.
-   */
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
-
-  /**
-   * Handle form submission for logging in.
-   *
-   * Authenticates the user using Supabase's `signInWithPassword` method. If the authentication
-   * fails, an error message is displayed; otherwise, the user is redirected to the dashboard.
-   *
-   * @param {React.FormEvent} e - The form submission event.
-   */
->>>>>>> e1e6e9612074734aa6233e7a007fe977cd624554
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(null);
@@ -125,16 +98,6 @@ export default function LoginPage() {
   };
 
   return (
-<<<<<<< HEAD
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white">
-        <button
-          className="self-start font-bold text-gray-600 hover:text-gray-800 ml-0.5 mb-16"
-          onClick={() => router.back()}
-        >
-          ← Go Back
-        </button>
-=======
     <div className="flex min-h-screen bg-gray-100 dark:bg-zinc-900">
       {/* Right Section: Contains the login form and related UI elements */}
       <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white dark:bg-zinc-900">
@@ -154,13 +117,14 @@ export default function LoginPage() {
             {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
           </button>
         </div>
->>>>>>> e1e6e9612074734aa6233e7a007fe977cd624554
 
         <div className="w-full max-w-md">
           <h1 className="text-2xl font-bold text-gray-800 mb-2 dark:text-zinc-200">
             Welcome Back!
           </h1>
-          <p className="text-gray-500 dark:text-zinc-300">Log in to your Account</p>
+          <p className="text-gray-500 dark:text-zinc-300">
+            Log in to your Account
+          </p>
           {error && <p className="text-red-500 text-sm mb-4">* {error}</p>}
           <form onSubmit={handleLogin} className="space-y-4 mt-10">
             <div>
@@ -189,25 +153,13 @@ export default function LoginPage() {
                 {showPassword ? "🐵" : "🙈"}
               </button>
             </div>
-<<<<<<< HEAD
             <div className="flex items-center justify-between text-sm text-gray-500">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="mr-2"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-=======
-            {/* Remember Me and Forgot Password Section */}
-            <div className="flex items-center justify-between text-sm text-gray-500">
-              {/**
-               * TODO: implement remember me functionality
-               */}
               <label className="flex items-center dark:text-zinc-300">
                 <input
                   type="checkbox"
                   className="mr-2 dark:border-zinc-900 dark:bg-zinc-800"
->>>>>>> e1e6e9612074734aa6233e7a007fe977cd624554
+                  checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
                 />
                 Remember me
               </label>
@@ -233,10 +185,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-<<<<<<< HEAD
-=======
-      {/* Left Section: Displayed on medium (md) and larger screens */}
->>>>>>> e1e6e9612074734aa6233e7a007fe977cd624554
       <div className="hidden md:flex flex-1 items-center justify-center bg-white">
         <div className="w-3/4 h-5/6 bg-gray-300 rounded-xl"></div>
       </div>
