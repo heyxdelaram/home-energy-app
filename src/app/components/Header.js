@@ -1,9 +1,17 @@
 // Header.jsx
-"use client";
-import React, { useContext, useEffect, useState } from "react";
-import { FaMoon, FaSun, FaCalendarAlt } from "react-icons/fa";
-import { DarkModeContext } from "../DarkModeContext";
 
+"use client"; // Indicating this component is intended for client-side rendering
+
+import React, { useContext, useEffect, useState } from "react"; // Importing necessary hooks and components from React
+import { FaMoon, FaSun, FaCalendarAlt } from "react-icons/fa"; // Importing icons for dark mode toggle and calendar
+import { DarkModeContext } from "../DarkModeContext"; // Importing context for dark mode (currently unused)
+
+ /**
+  * Helper function to format the date to a short format.
+  * 
+  * @param {Date} date - The date object to format.
+  * @returns {string} - The formatted date in short format (e.g., "Feb 8, 2025").
+  */
 const formatShortDate = (date) => {
   return date.toLocaleString("default", {
     month: "short",
@@ -12,12 +20,23 @@ const formatShortDate = (date) => {
   });
 };
 
+/**
+ * Header component renders the header section of the app, including:
+ * - Greeting message to the user
+ * - Current date
+ * - Dark mode toggle button
+ * - Information about missing bills for specific months
+ * 
+ * @param {Object} user - The user object containing user metadata (e.g., first name).
+ * @param {Array} fetchedReports - The list of fetched reports containing billing information.
+ * @returns {JSX.Element} - The header JSX component that includes the greeting, current date, and any missing bill information.
+ */
 function Header({ user, fetchedReports }) {
-  // const { darkMode, setDarkMode } = useContext(DarkModeContext);
+  // State hook for managing dark mode toggle
   const [darkMode, setDarkMode] = useState(false);
 
+  // Effect hook to toggle dark mode on the document root element based on state
   useEffect(() => {
-    // Toggle the "dark" class on the document root element
     if (darkMode) {
       document.documentElement.classList.add("dark");
     } else {
@@ -25,31 +44,21 @@ function Header({ user, fetchedReports }) {
     }
   }, [darkMode]);
 
-  const todayDate = new Date();
+  const todayDate = new Date(); // Get the current date
 
-  // Compute which months (from January up to the current month) are missing one or more bill types.
+  // List of month names for displaying missing months in the message
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June", "July", "August",
+    "September", "October", "November", "December",
   ];
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1; // 1-based month number
-  let missingMonths = [];
+  
+  const currentYear = new Date().getFullYear(); // Current year
+  const currentMonth = new Date().getMonth() + 1; // Current month (1-based index)
+  let missingMonths = []; // Array to store months with missing bill types
 
+  // If fetchedReports exists and is an array, calculate which months have missing bills
   if (fetchedReports && Array.isArray(fetchedReports)) {
-    // For each month from January (1) up to the current month:
     for (let m = 1; m <= currentMonth; m++) {
-      // Filter bills for the current year and for month m.
       const billsForMonth = fetchedReports.filter((report) => {
         const reportDate = new Date(report.date);
         return (
@@ -57,26 +66,26 @@ function Header({ user, fetchedReports }) {
           reportDate.getMonth() + 1 === m
         );
       });
-      // Get unique bill types in that month.
       const uniqueTypes = new Set(
         billsForMonth.map((report) => report.bill_type)
       );
-      // If fewer than 3 bill types are found, mark the month as incomplete.
+      // If fewer than 3 unique bill types exist for the month, mark the month as incomplete
       if (uniqueTypes.size < 3) {
         missingMonths.push(m);
       }
     }
   }
 
-  const missingCount = missingMonths.length;
+  const missingCount = missingMonths.length; // Get the number of missing months
   const missingMonthNames = missingMonths
-    .map((m) => monthNames[m - 1])
+    .map((m) => monthNames[m - 1]) // Get the names of the missing months
     .join(", ");
 
   return (
     <header className="pt-4">
       <div className="flex justify-between items-center">
         <div>
+          {/* Display a greeting message to the user or default to "User" */}
           {user && user.user_metadata && user.user_metadata.first_name ? (
             <h1 className="text-3xl font-bold text-gray-700 dark:text-zinc-200">
               Hello, {user.user_metadata.first_name}
@@ -86,21 +95,28 @@ function Header({ user, fetchedReports }) {
               Hello, User
             </h1>
           )}
+          {/* Display a description of the app */}
           <p className="text-gray-600 dark:text-zinc-400">
             Track your energy consumption
           </p>
         </div>
+        
+        {/* Dark mode toggle button */}
         <button
           onClick={() => setDarkMode(!darkMode)}
           className="text-gray-900 hover:text-white hover:dark:bg-green-800 hover:bg-green-800 dark:text-gray-100 bg-gray-100 dark:bg-zinc-800 p-2 rounded-full"
         >
           {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
         </button>
+
+        {/* Display current date */}
         <div className="bg-gray-100 flex flex-row gap-2 md:px-4 py-2 rounded-full shadow-sm text-sm text-black dark:bg-zinc-800 dark:text-zinc-200">
           <FaCalendarAlt />
           <span>{formatShortDate(todayDate)}</span>
         </div>
       </div>
+      
+      {/* Display a warning message if there are missing months */}
       {missingCount > 0 && (
         <div className="bg-gray-100 dark:bg-zinc-800 text-sm font-semibold text-gray-500 dark:text-zinc-200 p-2 rounded-full mt-4">
           <p>
