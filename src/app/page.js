@@ -12,7 +12,7 @@ const HomePage = () => {
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
             <div className="text-xl font-bold text-green-600">
-              <Link href="/">HOMENRG</Link>
+              <Link href="/">HOMENERG</Link>
             </div>
             {/* Links */}
             <div className="space-x-4">
@@ -54,7 +54,7 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="bg-white shadow-inner py-4">
         <div className="max-w-7xl mx-auto text-center text-gray-600 text-sm">
-          © {new Date().getFullYear()} HOMENRG. All rights reserved.
+          © {new Date().getFullYear()} HOMENERG. All rights reserved.
         </div>
       </footer>
     </div>
