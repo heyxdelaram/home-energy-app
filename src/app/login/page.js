@@ -1,15 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import CryptoJS from "crypto-js";
+
+const SECRET_KEY = "your-secret-key"; // Replace with an actual secret key
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
+
+  // Load stored credentials from localStorage
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("rememberedEmail");
+    const encryptedPassword = localStorage.getItem("encryptedPassword");
+
+    if (storedEmail) {
+      setEmail(storedEmail);
+      setRememberMe(true);
+    }
+
+    if (encryptedPassword) {
+      // Decrypt the password
+      const bytes = CryptoJS.AES.decrypt(encryptedPassword, SECRET_KEY);
+      const decryptedPassword = bytes.toString(CryptoJS.enc.Utf8);
+      setPassword(decryptedPassword);
+    }
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -24,6 +46,19 @@ export default function LoginPage() {
       if (supabaseError) {
         setError("Username or password incorrect");
       } else {
+        // Store credentials if "Remember Me" is checked
+        if (rememberMe) {
+          localStorage.setItem("rememberedEmail", email);
+          const encryptedPassword = CryptoJS.AES.encrypt(
+            password,
+            SECRET_KEY
+          ).toString();
+          localStorage.setItem("encryptedPassword", encryptedPassword);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+          localStorage.removeItem("encryptedPassword");
+        }
+
         router.push("/dashboard");
       }
     } catch (err) {
@@ -34,8 +69,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Right Section */}
-      <div className="flex flex-1 flex-col  items-center justify-center px-8 bg-white">
+      <div className="flex flex-1 flex-col items-center justify-center px-8 bg-white">
         <button
           className="self-start font-bold text-gray-600 hover:text-gray-800 ml-0.5 mb-16"
           onClick={() => router.back()}
@@ -50,7 +84,6 @@ export default function LoginPage() {
           <p className="text-gray-500">Log in to your Account</p>
           {error && <p className="text-red-500 text-sm mb-4">* {error}</p>}
           <form onSubmit={handleLogin} className="space-y-4 mt-10">
-            {/* Email Field */}
             <div>
               <input
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
@@ -60,7 +93,6 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            {/* Password Field */}
             <div className="relative">
               <input
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-green-500"
@@ -77,23 +109,23 @@ export default function LoginPage() {
                 {showPassword ? "🐵" : "🙈"}
               </button>
             </div>
-            {/* Remember Me and Forgot Password */}
             <div className="flex items-center justify-between text-sm text-gray-500">
-              {/**
-               * TODO: implement remember me functionality
-               */}
               <label className="flex items-center">
-                <input type="checkbox" className="mr-2" />
+                <input
+                  type="checkbox"
+                  className="mr-2"
+                  checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
+                />
                 Remember me
               </label>
-              {/**
-               * TODO: create a forgot password page
-               */}
-              <a href="#" className="text-green-500 hover:underline">
+              <a
+                href="/forgot-password"
+                className="text-green-500 hover:underline"
+              >
                 Forgot Password?
               </a>
             </div>
-            {/* Login Button */}
             <button
               type="submit"
               className="w-full mt-16 font-bold py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -109,7 +141,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-      {/* Left Section */}
       <div className="hidden md:flex flex-1 items-center justify-center bg-white">
         <div className="w-3/4 h-5/6 bg-gray-300 rounded-xl"></div>
       </div>

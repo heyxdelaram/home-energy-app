@@ -146,9 +146,6 @@ export default function SignUpPage() {
                 <input type="checkbox" className="mr-2" />
                 Remember me
               </label>
-              <a href="#" className="text-green-500 hover:underline">
-                Forgot Password?
-              </a>
             </div>
             {/* Sign Up Button */}
             <button
