@@ -1,56 +1,64 @@
-// App.js
+"use client";
+
+import Link from "next/link";
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Dashboard from "./dashboard/page";
-import Sidebar from "./components/Sidebar";
-import SettingsPage from "./settings/page";
-import SignUpPage from "./signup/page";
-import LoginPage from "./login/page";
-import { DarkModeProvider } from "./DarkModeContext";
-
-/**
- * App Component
- *
- * This component sets up the application's main layout and routing.
- * It wraps the application with a DarkModeProvider to manage the dark mode state globally,
- * and uses React Router to define client-side routes for different pages (Dashboard, Settings, Login, SignUp, etc.).
- *
- * The layout is structured with a persistent Sidebar and a main content area that changes based on the current route.
- *
- * @component
- * @example
- * return <App />;
- *
- * @returns {JSX.Element} The rendered application with routing and dark mode context.
- */
-const App = () => {
+const HomePage = () => {
   return (
-    // Provides dark mode state to the entire application.
-    <DarkModeProvider>
-      {/* Sets up client-side routing */}
-      <Router>
-        <div className="flex">
-          {/* Sidebar is rendered on every page */}
-          <Sidebar />
-          {/* Main content area: renders pages based on current route */}
-          <main className="dark:bg-zinc-900 flex-1 p-4">
-            <Routes>
-              {/* Route for the Dashboard page */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              {/* Route for the Settings page */}
-              <Route path="/settings" element={<SettingsPage />} />
-              {/* Route for the Login page */}
-              <Route path="/login" element={<LoginPage />} />
-              {/* Route for the Sign Up page */}
-              <Route path="/signup" element={<SignUpPage />} />
-              {/* Add other routes here */}
-            </Routes>
-          </main>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Navbar */}
+      <nav className="bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            {/* Logo */}
+            <div className="text-xl font-bold text-green-600">
+              <Link href="/">HOMENRG</Link>
+            </div>
+            {/* Links */}
+            <div className="space-x-4">
+              <Link
+                href="/login"
+                className="text-gray-700 font-semibold hover:text-green-600"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className=" text-white bg-green-600 rounded-lg font-medium hover:bg-green-700 px-4 py-2"
+              >
+                Sign up
+              </Link>
+            </div>
+          </div>
         </div>
-      </Router>
-    </DarkModeProvider>
+      </nav>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center">
+        <h1 className="text-4xl text-center font-extrabold text-gray-800 mb-4">
+          Welcome to your personal home energy manager!
+        </h1>
+        <p className="text-lg text-gray-600">
+          Manage your energy efficiently and with ease.
+        </p>
+        <div className="mt-8">
+          <Link
+            href="/signup"
+            className="px-6 py-2 text-white bg-green-600 rounded-lg font-medium hover:bg-green-700"
+          >
+            Get Started
+          </Link>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white shadow-inner py-4">
+        <div className="max-w-7xl mx-auto text-center text-gray-600 text-sm">
+          © {new Date().getFullYear()} HOMENRG. All rights reserved.
+        </div>
+      </footer>
+    </div>
   );
 };
 
-export default App;
+export default HomePage;
