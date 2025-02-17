@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { FaMoon, FaSun } from "react-icons/fa";
+import Image from "next/image";
 
 /**
  * SignUpPage Component
@@ -227,8 +228,8 @@ export default function SignUpPage() {
         </div>
       </div>
       {/* Right Section: Displayed on medium screens and above */}
-      <div className="hidden md:flex flex-1 items-center justify-center bg-gray-200">
-        <div className="w-3/4 h-5/6 bg-gray-300 rounded-xl"></div>
+      <div className="hidden md:flex flex-1 items-center justify-center bg-white dark:bg-zinc-900">
+        <Image alt="" width={500} height={300} src="/5.jpg" className="w-3/4 h-5/6 rounded-xl"/>
       </div>
     </div>
   );

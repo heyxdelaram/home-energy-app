@@ -8,6 +8,7 @@ import CryptoJS from "crypto-js";
 const SECRET_KEY = "your-secret-key"; // Replace with an actual secret key
 
 import { FaMoon, FaSun } from "react-icons/fa";
+import Image from "next/image";
 
 /**
  * LoginPage Component
@@ -185,8 +186,8 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-      <div className="hidden md:flex flex-1 items-center justify-center bg-white">
-        <div className="w-3/4 h-5/6 bg-gray-300 rounded-xl"></div>
+      <div className="hidden md:flex flex-1 items-center justify-center bg-white dark:bg-zinc-900">
+        <Image alt="" width={500} height={300} src="/6.jpg" className="w-3/4 h-5/6 rounded-xl"/>
       </div>
     </div>
   );
