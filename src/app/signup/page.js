@@ -228,7 +228,7 @@ export default function SignUpPage() {
         </div>
       </div>
       {/* Right Section: Displayed on medium screens and above */}
-      <div className="hidden md:flex flex-1 items-center justify-center bg-white dark:bg-zinc-900">
+      <div className="hidden md:flex flex-1 items-center justify-center bg-white dark:bg-zinc-900 max-h-screen">
         <Image alt="" width={500} height={300} src="/5.jpg" className="w-3/4 h-5/6 rounded-xl"/>
       </div>
     </div>
