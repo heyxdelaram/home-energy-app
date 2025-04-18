@@ -115,6 +115,7 @@ export default function Dashboard() {
           usage: parseFloat(formData.usage),
           date: formData.date,
           user_id: user.id,
+          goal_usage: 50,
         })
         .select();
 
@@ -251,10 +252,7 @@ export default function Dashboard() {
             .eq("id", lastReport.id);
 
           if (fetchError) {
-            console.error(
-              "Error fetching updated report:",
-              fetchError.message
-            );
+            console.error("Error fetching updated report:", fetchError.message);
           } else {
             console.log("Updated Report Data:", updatedReport[0]);
             setLastReport(updatedReport[0]);
@@ -371,6 +369,7 @@ export default function Dashboard() {
     );
     const usageData = sortedReports.map((report) => report.usage || 0);
     const costData = sortedReports.map((report) => report.cost || 0);
+    const goalUsageData = new Array(sortedReports.length).fill(50);
 
     // Update the chart data state.
     setChartData({
@@ -387,6 +386,13 @@ export default function Dashboard() {
           data: costData,
           borderColor: "#4CAF50",
           backgroundColor: "rgba(76, 175, 80, 0.2)",
+        },
+        {
+          label: "Goal Usage",
+          data: goalUsageData,
+          borderColor: "#7F00FF",
+          backgroundColor: "rgba(127, 0, 255, 0.2)",
+          borderDash: [5, 5], // dashed line for visual distinction
         },
       ],
     });
